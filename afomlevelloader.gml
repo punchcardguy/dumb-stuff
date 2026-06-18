@@ -1546,19 +1546,23 @@ with instance_create(0, 0, obj_custom_object_ext)
 			with obj_camera 
 				visible = false;
 		} 
-		static scr_load_file = function(filename) // Lowkey ripped this from my modloader
+		if self[$ "scr_load_file"] == undefined
 		{
-			var _gml = "";
-			if file_exists(filename)
+			scr_load_file = function(filename) // Lowkey ripped this from my modloader
 			{
-				var _file = buffer_load(filename);
-				if buffer_get_size(_file) > 0
-					_gml = buffer_read(_file, buffer_string);
-				buffer_delete(_file); 
+				var _gml = "";
+				if file_exists(filename)
+				{
+					var _file = buffer_load(filename);
+					if buffer_get_size(_file) > 0
+						_gml = buffer_read(_file, buffer_string);
+					buffer_delete(_file); 
+				}
+				return _gml;
 			}
-			return _gml;
 		}
 		if self[$ "add_afom_rooms"]  == undefined
+		{
 			add_afom_rooms = function() 
 			{
 				for (var i = 0, i_len3 = array_length(global.levelmemory);i < i_len3;i++) 
@@ -1606,6 +1610,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 				} 
 				exit;
 			}
+		}
 		if doposshit
 		{
 			with obj_player1
@@ -1780,43 +1785,42 @@ with instance_create(0, 0, obj_custom_object_ext)
 			} 
 		} 
 		if levelLoaded
-			exit;
-		static find_files_recursive = function(folder, ext, max)
+			exit
+		if self[$ "find_files_recursive"]
 		{
-		    var dirQueue = ds_queue_create();
-		    var fileArray = [];
-		    ds_queue_enqueue(dirQueue, folder);
-		    var startDepth = string_count("/", folder);
-		    
-		    while !ds_queue_empty(dirQueue)
-		    {
-		        var currDir = ds_queue_dequeue(dirQueue);
-		        for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
-		        {
-		            var check = fold + "/";
-		            if directory_exists(currDir + check)
-		            {
-		                if max == undefined or string_count("/", currDir + check) - startDepth <= max
-		                    ds_queue_enqueue(dirQueue, currDir + check);
-		            }
-		        }
-		        file_find_close();
-		        
-		        var file = file_find_first(currDir + "*" + ext, 0);
-		        for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
-		        {
-		            if !directory_exists(currDir + file)
-		                array_push(fileArray, currDir + file);
-		        }
-		        file_find_close();
-		    }
-		    
-		    return fileArray;
+			find_files_recursive = function(folder, ext, max)
+			{
+			    var dirQueue = ds_queue_create();
+			    var fileArray = [];
+			    ds_queue_enqueue(dirQueue, folder);
+			    var startDepth = string_count("/", folder);
+			    
+			    while !ds_queue_empty(dirQueue)
+			    {
+			        var currDir = ds_queue_dequeue(dirQueue);
+			        for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
+			        {
+			            var check = fold + "/";
+			            if directory_exists(currDir + check)
+			            {
+			                if max == undefined or string_count("/", currDir + check) - startDepth <= max
+			                    ds_queue_enqueue(dirQueue, currDir + check);
+			            }
+			        }
+			        file_find_close();
+			        
+			        var file = file_find_first(currDir + "*" + ext, 0);
+			        for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
+			        {
+			            if !directory_exists(currDir + file)
+			                array_push(fileArray, currDir + file);
+			        }
+			        file_find_close();
+			    }
+			    
+			    return fileArray;
+			}
 		}
-		static cycle = function(v, min, max) 
-		{
-			return (v > max) ? min : (v < min) ? max : v;
-		} 
 		scr_getinput();
 		move = (key_down2 - key_up2);
 		if move != 0
@@ -1825,7 +1829,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 			scr_soundeffect(sfx_step);
 		}
 		// i know i couldve handled the tab system better but i dont know how i wouldve did it
-		var current_tab_len = (tab == 0 ? array_length(levels) - 1: array_length(options) - 1);
+		var current_tab_len = (tab == 0 ? array_length(levels) : array_length(options));
 		selected = cycle(selected, 0, current_tab_len);
 		if key_shoot2
 			tab++;
@@ -1953,6 +1957,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 		if !levelLoaded
 			exit;
 		if self[$ "draw_sprite_tiled_direction"] == undefined // NO IDEA HOW THIS WORKED
+		{
 			draw_sprite_tiled_direction = function(spr, ind, _x, _y, tilx, tily)
 			{
 			    var w = sprite_get_width(spr);
@@ -1991,6 +1996,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 			    }
 				exit;
 			} 
+		}
 		var m_len = array_length(global.levelmemory);
 		for (var m = 0;m < m_len;m++)
 		{
