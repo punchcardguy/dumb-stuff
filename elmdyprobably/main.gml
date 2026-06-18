@@ -321,13 +321,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		
 		var _minutes = floor(tseconds / 60);
-		var _seconds = tseconds mod 60;
+		var _seconds = floor(tseconds mod 60);
 		
 		var _check = (_seconds <= 3 && _minutes <= 0);
 		
 		draw_sprite_ext(sr("spr_lap4timer"), 0, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
 		draw_set_color(_check ? c_red : c_white);
-		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(floor(_seconds))));
+		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + floor(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
 	';
 	event.room_start[0] = @'
