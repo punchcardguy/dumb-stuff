@@ -215,13 +215,14 @@ global.lap4times =
     tower_entrancehall: 3
 };
 
+instance_destroy(obj_custom_object_ext);
 with (instance_create(0, 0, obj_custom_object_ext))
 {
 	persistent = true;
 	image_alpha = 0;
 	download_queue = ds_queue_create();
 	downloading = false;
-	downloadFile = function(_file, _filename, _frames = 0, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
+	downloadFile = function(_file, _filename, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
 	{
 		var q =
 		{
@@ -234,7 +235,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		ds_queue_enqueue(download_queue, q);
 	}
-	downloadFile("https://github.com/randomguy1177/PTEM-gmls/blob/main/elmdyprobably/spr_lap4timer.png?raw=true", "sprites/spr_lap4timer");
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4timer.png", "spr_lap4timer.png");
 	s = 1 / 60;
 	tseconds = 20;
 	offset = -200;
@@ -255,7 +256,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			} 
 		}
 		
-		tseconds -= s;
+		tseconds = max(tseconds - s, 0);
 		offset = Approach(offset, 0, 2);
 	;'
 	event.http[0] = @';
@@ -275,18 +276,24 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			downloading = false;
 		} 
 	';
-	drawgui_event = @'
-		if self[$ "sr"] == undefined
-			sr = function(arg0) {sprite_exists(variable_global_get(arg0)) ? variable_global_get(arg0) : spr_null;};
+	event.draw_gui[0] = @'
+		sr = function(arg0)
+		{
+			if !variable_global_exists(arg0)
+				return spr_player_move;
+			
+			return sprite_exists(variable_global_get(arg0)) ? variable_global_get(arg0) : spr_player_idle;
+		}
 		
 		draw_set_font(global.bigfont);
-		draw_set_color(1);
+		draw_set_color(c_white);
+		draw_set_alpha(1);
 		
 		draw_set_valign(fa_middle);
 		draw_set_halign(fa_center);
 		
 		draw_sprite_ext(sr("spr_lap4timer"), 0, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
-		draw_text(87, display_get_gui_height() - 100 - offset, "0:" + ((tseconds < 10 ? "0" : "") + string(tseconds)));
+		draw_text(87, display_get_gui_height() - 100 - offset, "0:" + ((tseconds < 10 ? "0" : "") + string(floor(tseconds))));
 	';
 	docommand("reload_gml");
 }
