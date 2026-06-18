@@ -248,6 +248,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	s = 1 / 60;
 	tseconds = 20;
 	prev_tseconds = 20;
+	addseconds = 0;
+	addsecondstimer = 0;
 	offset = -200;
 	ind = 0;
 	event.step[0] = @'
@@ -275,13 +277,26 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			} 
 		}
 		
-		if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
+		if addseconds > 0
 		{
-			scr_soundeffect(variable_global_get("sfx_losetime"));
-			prev_tseconds = tseconds;
+			if addsecondstimer > 0
+				addsecondstimer--;
+			else
+			{
+				addseconds--;
+				tseconds++;
+				addsecondstimer = 2;
+			}
 		}
-		
-		tseconds = max(tseconds - s, 0);
+		else
+		{
+			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
+			{
+				scr_soundeffect(variable_global_get("sfx_losetime"));
+				prev_tseconds = tseconds;
+			}
+			tseconds = max(tseconds - s, 0);
+		}
 		offset = Approach(offset, 0, 2);
 	;'
 	event.http[0] = @';
@@ -332,7 +347,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	';
 	event.room_start[0] = @'
 		if global.lap4times[$ room_get_name(room)] != undefined
-			tseconds += global.lap4times[$ room_get_name(room)];
+			addseconds = global.lap4times[$ room_get_name(room)];
 	;'
 	docommand("reload_gml");
 }
