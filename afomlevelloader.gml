@@ -1785,7 +1785,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 			} 
 		} 
 		if levelLoaded
-			exit
+			exit;
 		if self[$ "find_files_recursive"] == undefined
 		{
 			find_files_recursive = function(folder, ext, max)
