@@ -1786,41 +1786,6 @@ with instance_create(0, 0, obj_custom_object_ext)
 		} 
 		if levelLoaded
 			exit;
-		if self[$ "find_files_recursive"] == undefined
-		{
-			find_files_recursive = function(folder, ext, max)
-			{
-			    var dirQueue = ds_queue_create();
-			    var fileArray = [];
-			    ds_queue_enqueue(dirQueue, folder);
-			    var startDepth = string_count("/", folder);
-			    
-			    while !ds_queue_empty(dirQueue)
-			    {
-			        var currDir = ds_queue_dequeue(dirQueue);
-			        for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
-			        {
-			            var check = fold + "/";
-			            if directory_exists(currDir + check)
-			            {
-			                if max == undefined or string_count("/", currDir + check) - startDepth <= max
-			                    ds_queue_enqueue(dirQueue, currDir + check);
-			            }
-			        }
-			        file_find_close();
-			        
-			        var file = file_find_first(currDir + "*" + ext, 0);
-			        for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
-			        {
-			            if !directory_exists(currDir + file)
-			                array_push(fileArray, currDir + file);
-			        }
-			        file_find_close();
-			    }
-			    
-			    return fileArray;
-			}
-		}
 		scr_getinput();
 		move = (key_down2 - key_up2);
 		if move != 0
@@ -1885,6 +1850,41 @@ with instance_create(0, 0, obj_custom_object_ext)
 				
 				if loadcustomsprites
 				{
+					if self[$ "find_files_recursive"] == undefined
+					{
+						find_files_recursive = function(folder, ext, max)
+						{
+						    var dirQueue = ds_queue_create();
+						    var fileArray = [];
+						    ds_queue_enqueue(dirQueue, folder);
+						    var startDepth = string_count("/", folder);
+						    
+						    while !ds_queue_empty(dirQueue)
+						    {
+						        var currDir = ds_queue_dequeue(dirQueue);
+						        for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
+						        {
+						            var check = fold + "/";
+						            if directory_exists(currDir + check)
+						            {
+						                if max == undefined or string_count("/", currDir + check) - startDepth <= max
+						                    ds_queue_enqueue(dirQueue, currDir + check);
+						            }
+						        }
+						        file_find_close();
+						        
+						        var file = file_find_first(currDir + "*" + ext, 0);
+						        for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
+						        {
+						            if !directory_exists(currDir + file)
+						                array_push(fileArray, currDir + file);
+						        }
+						        file_find_close();
+						    }
+						    
+						    return fileArray;
+						}
+					}
 					var sprites = find_files_recursive(path + levels[selected].name + "/sprites/", ".png");
 					for (var i = 0, sprite_len = array_length(sprites);i < sprite_len;i++)
 					{
