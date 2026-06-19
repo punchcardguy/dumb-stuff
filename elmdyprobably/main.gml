@@ -224,10 +224,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	enum asset_type_dl
 	{
 		sprite,
-		sound
+		sound,
+		replace
 	}
 	downloading = false;
-	downloadFile = function(_file, _filename, _type = asset_type_dl.sprite, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
+	downloadFile = function(_file, _filename, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
 	{
 		var q =
 		{
@@ -236,15 +237,43 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			frames : _frames,
 			xo : xorigin,
 			yo : yorigin,
-			type : _type
+			type : asset_type_dl.sprite,
 		};
 		
 		ds_queue_enqueue(download_queue, q);
 	}
-	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4timer.png", "spr_lap4timer.png", asset_type_dl.sprite, 1, 0, 200);
-	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_idle.png", "spr_mrskelly_idle.png", asset_type_dl.sprite, 3, 0, 200);
-	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_timelow.png", "spr_mrskelly_timelow.png", asset_type_dl.sprite, 6, 0, 200);
-	downloadFile("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg", asset_type_dl.sound);
+	
+	downloadFileSound = function(_file, _filename) // this could be a constructor but im reusing code so it doesn't matter
+	{
+		var q =
+		{
+			file : _file, 
+			name : _filename,
+			type : asset_type_dl.sound,
+		};
+		
+		ds_queue_enqueue(download_queue, q);
+	}
+	
+	downloadFileReplace = function(_file, _spritename, _filename, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
+	{
+		var q =
+		{
+			file : _file, 
+			name : _filename,
+			spritename : _spritename,
+			frames : _frames,
+			xo : xorigin,
+			yo : yorigin,
+			type : asset_type_dl.replace,
+		};
+		
+		ds_queue_enqueue(download_queue, q);
+	}
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4timer.png", "spr_lap4timer.png", 1, 0, 200);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_idle.png", "spr_mrskelly_idle.png", 3, 0, 200);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_timelow.png", "spr_mrskelly_timelow.png", 6, 0, 200);
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	s = 1 / 60;
 	tseconds = 20;
 	prev_tseconds = 20;
@@ -252,6 +281,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	addsecondstimer = 0;
 	offset = -200;
 	ind = 0;
+	postivenumbers = []; // flash : true, alpha : 1.5, color : #58C000 (116, display_get_gui_height() - 64 - offset)
+	req = noone;
 	event.step[0] = @'
 		ind += 0.35;
 		if !ds_queue_empty(download_queue) && !downloading
@@ -261,7 +292,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if !file_exists(d.name)
 			{
 				downloading = true;
-			    http_get_file(d.file, d.name);
+			    req = http_get_file(d.file, d.name);
 			} 
 			else
 			{
@@ -273,6 +304,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 				else if d.type == 1
 					variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
+				else if d.type == 2 && asset_get_index(spritename) != -1
+					sprite_replace(asset_get_index(spritename), d.name, d.frames, false, false, d.xo, d.yo);
 				ds_queue_dequeue(download_queue);
 			} 
 		}
@@ -288,7 +321,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				addsecondstimer = 2;
 			}
 		}
-		else
+		else if !instance_exists(obj_fadeout)
 		{
 			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
 			{
@@ -299,31 +332,37 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 		offset = Approach(offset, 0, 2);
 	;'
-	event.http[0] = @';
-		var status = async_load[? "status"];
-		if status == 0
+	event.http[0] = @'
+		if async_load[? "id"] == req
 		{
-		    var d = ds_queue_head(download_queue);
-			
-			if file_exists(d.name)
+			if async_load[? "status"] == 0
 			{
-				if d.type == 0
+				var d = ds_queue_head(download_queue);
+				
+				if file_exists(d.name)
 				{
-					var _spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
-					sprite_set_speed(_spr, 60, 60);
-					variable_global_set(string_replace_all(d.name, ".png", ""), _spr);
+					if d.type == 0
+					{
+						var _spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
+						sprite_set_speed(_spr, 60, 60);
+						variable_global_set(string_replace_all(d.name, ".png", ""), _spr);
+					}
+					else if d.type == 1
+						variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
+					else if d.type == 2 && asset_get_index(d.spritename) != -1
+						sprite_replace(asset_get_index(d.spritename), d.name, d.frames, false, false, d.xo, d.yo);
 				}
-				else if d.type == 1
-					variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
+				ds_queue_dequeue(download_queue);
+				downloading = false;
+				req = -1;
 			}
-			ds_queue_dequeue(download_queue);
-			downloading = false;
+			else
+			{
+				ds_queue_dequeue(download_queue);
+				downloading = false;
+				req = -1;
+			} 
 		}
-		else
-		{
-			ds_queue_dequeue(download_queue);
-			downloading = false;
-		} 
 	';
 	event.draw_gui[0] = @'
 		sr = function(arg0) {if !variable_global_exists(arg0) || !sprite_exists(variable_global_get(arg0)) return spr_player_idle; return variable_global_get(arg0);}
@@ -344,10 +383,37 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_set_color(_check ? c_red : c_white);
 		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
+		
+		for (var  len = array_length(postivenumbers), i = len - 1; i >= 0; i--)
+		{
+			with postivenumbers[i]
+			{
+				alpha -= 0.03;
+				if alpha <= 0
+					array_delete(other.postivenumbers, i, 1);
+				y -= 0.5;
+				draw_set_halign(fa_left);
+				draw_set_alpha(alpha);
+				draw_set_color(#58C000);
+				draw_text(x, y, number);
+			}
+		}
+		
+		draw_set_alpha(1);
+		draw_set_color(c_white);
 	';
 	event.room_start[0] = @'
 		if global.lap4times[$ room_get_name(room)] != undefined
-			addseconds = global.lap4times[$ room_get_name(room)];
+		{
+			addseconds = global.lap4times[$ room_get_name(room)]; // // flash : true, alpha : 1.5, color : #58C000 (116, display_get_gui_height() - 64 - offset)
+			array_push(postivenumbers,
+			{
+				x : 124,
+				y : display_get_gui_height() - 96 - offset,
+				alpha : 1.5,
+				number : "+" + string(addseconds)
+			});
+		}
 	;'
 	docommand("reload_gml");
 }
