@@ -273,9 +273,17 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4timer.png", "spr_lap4timer.png", 1, 0, 200);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_idle.png", "spr_mrskelly_idle.png", 3, 0, 200);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_timelow.png", "spr_mrskelly_timelow.png", 6, 0, 200);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3warning.png", "spr_lap3warning.png", 1, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3.png", "spr_lap3.png", 1, 123);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4warning.png", "spr_lap4warning", 1, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4.png", "spr_lap4.png", 1, 123);
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
+
 	s = 1 / 60;
-	tseconds = 20;
+	tseconds = 0;
 	prev_tseconds = 20;
 	addseconds = 0;
 	addsecondstimer = 0;
@@ -283,8 +291,23 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	ind = 0;
 	postivenumbers = []; // flash : true, alpha : 1.5, color : #58C000 (116, display_get_gui_height() - 64 - offset)
 	req = noone;
+	larpwarningspr = spr_lap2warning;
+	lapsong = "mu_lap3_2";
+	snickexe =
+	{
+		x : 0,
+		y : 0,
+		image_index : 0,
+		sprite_index : spr_snick_exe,
+		playerid : obj_player1,
+		finalspeed : 0,
+		image_xscale : 1,
+		image_yscale : 1,
+		image_speed : 0.35
+	}
 	event.step[0] = @'
 		ind += 0.35;
+		
 		if !ds_queue_empty(download_queue) && !downloading
 		{
 			var d = ds_queue_head(download_queue);
@@ -310,6 +333,94 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			} 
 		}
 		
+		with obj_lap2visual
+		{
+			if global.laps == 2
+				sprite_index = other.sr("spr_lap3");
+			else if global.laps >= 3
+				sprite_index = other.sr("spr_lap4");
+		}
+		
+		with obj_lapportal if sprite_index == spr_pizzaportalend && image_index == 0
+		{
+			instance_create(x, y, obj_smallnumber).number = 3000 * (global.laps + 1);
+			global.collect += 3000 * (global.laps + 1);
+			global.combotime = 60;
+			if !global.oldsprites
+				scr_soundeffect(sfx_lapenter);
+		}
+		
+		with obj_lapportalentrance if sprite_index == spr_pizzaportal_disappear && image_index == 0 && !global.oldsprites 
+			scr_soundeffect(sfx_lapexit);
+		
+		if global.laps < 3 || room == timesuproom || room == rank_room
+		{
+			offset = -200;
+			exit;
+		}
+		
+		with snickexe
+		{
+			var _dir = point_direction(x, y, playerid.x, playerid.y);
+			var _spd = 5;
+			var _dist = point_distance(x, y, playerid.x, playerid.y);
+			
+			image_index += image_speed;
+
+			if (_dist < 300)
+				_spd = 5;
+
+			if (_dist >= 300)
+				_spd = 6.75;
+
+			if (_dist >= 600)
+				_spd = 17;
+
+			if (_dist >= 800)
+				_spd = 37.5;
+
+			finalspeed = lerp(finalspeed, _spd, 0.1);
+
+			if (sign(playerid.x - x) != 0)
+				image_xscale = sign(playerid.x - x);
+
+			x += lengthdir_x(finalspeed, _dir);
+			y += lengthdir_y(finalspeed, _dir);
+
+			/* if (_dist >= 300)
+			{
+				if (sprite_index != spr_snick_exe_lungestart && sprite_index != spr_snick_exe_lunge)
+				{
+					sprite_index = spr_snick_exe_lungestart;
+					image_index = 0;
+				}
+				
+				if (floor(image_index) == (image_number - 1) && sprite_index == spr_snick_exe_lungestart)
+					sprite_index = spr_snick_exe_lunge;
+			}
+			else
+			{
+				if (sprite_index != spr_snick_exe_lungeend && sprite_index != spr_snick_exe)
+				{
+					sprite_index = spr_snick_exe_lungeend;
+					image_index = 0;
+				}
+				
+				if (floor(image_index) == (image_number - 1) && sprite_index == spr_snick_exe_lungeend)
+					sprite_index = spr_snick_exe;
+			} */
+
+			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42)
+			{
+				instance_create(x, y, obj_genericpoofeffect);
+				x = room_width / 2;
+				y = -100;
+			}
+			
+			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
+				scr_hurtplayer(playerid);
+		}
+		
 		if addseconds > 0
 		{
 			if addsecondstimer > 0
@@ -321,7 +432,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				addsecondstimer = 2;
 			}
 		}
-		else if !instance_exists(obj_fadeout)
+		
+		if addseconds <= 0 && !instance_exists(obj_fadeout)
 		{
 			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
 			{
@@ -330,6 +442,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 			tseconds = max(tseconds - s, 0);
 		}
+		
 		offset = Approach(offset, 0, 2);
 	;'
 	event.http[0] = @'
@@ -365,7 +478,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 	';
 	event.draw_gui[0] = @'
-		sr = function(arg0) {if !variable_global_exists(arg0) || !sprite_exists(variable_global_get(arg0)) return spr_player_idle; return variable_global_get(arg0);}
+		sr = function(arg0) {if !variable_global_exists(arg0) return spr_player_idle; return variable_global_get(arg0);}
+		
+		if global.laps < 3 || room == timesuproom || room == rank_room
+			exit;
 		
 		draw_set_font(global.bigfont);
 		draw_set_alpha(1);
@@ -383,6 +499,21 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_set_color(_check ? c_red : c_white);
 		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
+		
+		/* if tseconds <= 0
+		{
+			with obj_player1
+			{
+				instance_destroy(obj_fadeout);
+				targetDoor = "A";
+				room = timesuproom;
+				state = 64;
+				sprite_index = spr_Timesup;
+				image_index = 0;
+				audio_stop_all();
+				scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
+			}
+		} */
 		
 		for (var  len = array_length(postivenumbers), i = len - 1; i >= 0; i--)
 		{
@@ -402,10 +533,92 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_set_alpha(1);
 		draw_set_color(c_white);
 	';
-	event.room_start[0] = @'
-		if global.lap4times[$ room_get_name(room)] != undefined
+	event.draw[0] = @'
+		if global.laps >= 3
 		{
-			addseconds = global.lap4times[$ room_get_name(room)]; // // flash : true, alpha : 1.5, color : #58C000 (116, display_get_gui_height() - 64 - offset)
+			with snickexe
+				draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, 0, c_white, 1);
+		}
+		
+		if global.oldsprites || !instance_exists(obj_lapportal)
+			exit;
+		
+		with obj_lapportal
+		{
+			visible = false;
+			if sprite_index != spr_pizzaportal
+			{
+				if global.usepaletteshaders
+				{
+					shader_set(global.Pal_Shader);
+					pal_swap_set(obj_player1.spr_palette, obj_player1.paletteselect, 0);
+					draw_self();
+					shader_reset();
+				}
+				else
+					draw_self();
+			}
+			else
+			{
+				draw_self();
+				if other.larpwarningspr == other.sr("spr_lap3warning") && global.usepaletteshaders
+				{
+					shader_set(global.Pal_Shader);
+					pal_swap_set(obj_player1.spr_palette, obj_player1.paletteselect, 0);
+					draw_sprite(other.larpwarningspr, 0, x, y + Wave(-5, 5, 0.5, 5));
+					shader_reset();
+				}
+				else
+					draw_sprite(other.larpwarningspr, 0, x, y + Wave(-5, 5, 0.5, 5));
+			}
+		}
+	';
+	event.room_start[0] = @'
+		with snickexe
+		{
+			x = room_width / 2;
+			y = -100;
+		}
+		
+		switch global.laps
+		{
+			case 0:
+				larpwarningspr = spr_lap2warning;
+			break;
+			
+			case 1:
+				larpwarningspr = sr("spr_lap3warning");
+			break;
+			
+			case 2:
+				larpwarningspr = sr("spr_lap4warning");
+			break;
+			
+			default:
+				larpwarningspr = sr("spr_lap4warning");
+			break;
+		}
+		
+		if instance_exists(obj_lapportalentrance)
+		{
+			if global.laps == 2
+			{
+				global.fill = 0;
+				lapsong = "mu_lap3_2";
+			}
+			else if global.laps >= 3
+				lapsong = "mu_lap4_v2";
+			
+			if !audio_is_playing(sr(lapsong))
+			{
+				audio_stop_sound(obj_music.musicID);
+				obj_music.musicID = scr_music(sr(lapsong));
+			}
+		}
+		
+		if global.laps >= 3 && global.lap4times[$ room_get_name(room)] != undefined
+		{
+			addseconds = global.lap4times[$ room_get_name(room)];
 			array_push(postivenumbers,
 			{
 				x : 124,
