@@ -212,13 +212,60 @@ global.lap4times =
     tower_escape11: 12,
     tower_escape12: 10,
     tower_1: 6,
-    tower_entrancehall: 3
+    tower_entrancehall: 3,
+	
+	strongcold_1 : 6,
+	strongcold_miniboss : 1,
+	strongcold_2 : 6,
+	strongcold_3 : 10,
+	strongcold_4 : 12,
+	strongcold_5 : 12,
+	strongcold_6 : 10,
+	strongcold_7 : 6,
+	strongcold_8 : 12,
+	strongcold_9 : 6,
+	strongcold_10 : 3,
+
+	normalT_treasure : 2,
+	normalT_room6 : 2,
+	normalT_room5 : 3,
+	normalT_room4 : 4,
+	normalT_room3 : 4,
+	normalT_room2 : 4,
+	normalT_room1 : 3,
+	normalT_runbackpassage : 1,
+	tutorial_room1 : 4,
+	
+	desert_16 : 3,
+	desert_11 : 3,
+	desert_10 : 4,
+	desert_9 : 4,
+	desert_8 : 6,
+	desert_7 : 3,
+	desert_6 : 3,
+	desert_5 : 6,
+	desert_4 : 4,
+	desert_3 : 4,
+	desert_2 : 4,
+	desert_1 : 4,
+	desert_secret1 : 2,
+
+	dragonlair_1 : 2,
+	dragonlair_2 : 20,
+	dragonlair_3 : 5,
+	dragonlair_4 : 10,
+	dragonlair_5 : 12,
+	dragonlair_6 : 3,
+	dragonlair_7 : 3,
+	dragonlair_8 : 10,
+	dragonlair_9 : 4
 };
 
 instance_destroy(obj_custom_object_ext);
 with (instance_create(0, 0, obj_custom_object_ext))
 {
 	persistent = true;
+	fuckmeforexisting = 5;
 	image_alpha = 0;
 	download_queue = ds_queue_create();
 	enum asset_type_dl
@@ -243,7 +290,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		ds_queue_enqueue(download_queue, q);
 	}
 	
-	downloadFileSound = function(_file, _filename) // this could be a constructor but im reusing code so it doesn't matter
+	downloadFileSound = function(_file, _filename)
 	{
 		var q =
 		{
@@ -255,7 +302,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		ds_queue_enqueue(download_queue, q);
 	}
 	
-	downloadFileReplace = function(_file, _spritename, _filename, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
+	downloadFile_imsofuckinglazy = function(_file, _spritename, _filename, _frames = 1, xorigin = 0, yorigin = 0)
 	{
 		var q =
 		{
@@ -270,21 +317,30 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		ds_queue_enqueue(download_queue, q);
 	}
+	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4timer.png", "spr_lap4timer.png", 1, 0, 200);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_idle.png", "spr_mrskelly_idle.png", 3, 0, 200);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_mrskelly_timelow.png", "spr_mrskelly_timelow.png", 6, 0, 200);
+	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3warning.png", "spr_lap3warning.png", 1, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3.png", "spr_lap3.png", 1, 123);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4warning.png", "spr_lap4warning", 1, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4.png", "spr_lap4.png", 1, 123);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungestart.png", "spr_snick_exe_lungestart.png", 3, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lunge.png", "spr_snick_exe_lunge.png", 4, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungeend.png", "spr_snick_exe_lungeend.png", 5, 50, 50);
+	
+	// https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungestart.png
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
-
+	
+	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", "spr_bigfont.png", 69);
 	s = 1 / 60;
 	tseconds = 0;
-	prev_tseconds = 20;
+	prev_tseconds = 0;
 	addseconds = 0;
 	addsecondstimer = 0;
 	offset = -200;
@@ -303,8 +359,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		finalspeed : 0,
 		image_xscale : 1,
 		image_yscale : 1,
-		image_speed : 0.35
-	}
+		image_speed : 0.35,
+		image_number : 0
+	};
+	candie = false;
 	event.step[0] = @'
 		ind += 0.35;
 		
@@ -327,8 +385,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 				else if d.type == 1
 					variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
-				else if d.type == 2 && asset_get_index(spritename) != -1
-					sprite_replace(asset_get_index(spritename), d.name, d.frames, false, false, d.xo, d.yo);
+				else if d.type == 2 && asset_get_index(d.spritename) != -1
+				{
+					sprite_replace(asset_get_index(d.spritename), d.name, d.frames, false, false, d.xo, d.yo);
+					global.bigfont = font_add_sprite_ext(spr_font, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
+				}
 				ds_queue_dequeue(download_queue);
 			} 
 		}
@@ -356,6 +417,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if global.laps < 3 || room == timesuproom || room == rank_room
 		{
 			offset = -200;
+			candie = false;
+			// tseconds = 5; // this shitty fix will make me kill myself soon
 			exit;
 		}
 		
@@ -366,49 +429,50 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			var _dist = point_distance(x, y, playerid.x, playerid.y);
 			
 			image_index += image_speed;
+			image_number = sprite_get_number(sprite_index);
 
-			if (_dist < 300)
+			if _dist < 300
 				_spd = 5;
 
-			if (_dist >= 300)
+			if _dist >= 300
 				_spd = 6.75;
 
-			if (_dist >= 600)
+			if _dist >= 600
 				_spd = 17;
 
-			if (_dist >= 800)
+			if _dist >= 800
 				_spd = 37.5;
 
 			finalspeed = lerp(finalspeed, _spd, 0.1);
 
-			if (sign(playerid.x - x) != 0)
+			if sign(playerid.x - x) != 0
 				image_xscale = sign(playerid.x - x);
 
 			x += lengthdir_x(finalspeed, _dir);
 			y += lengthdir_y(finalspeed, _dir);
 
-			/* if (_dist >= 300)
+			if _dist >= 300
 			{
-				if (sprite_index != spr_snick_exe_lungestart && sprite_index != spr_snick_exe_lunge)
+				if (sprite_index != other.sr("spr_snick_exe_lungestart") && sprite_index != other.sr("spr_snick_exe_lunge"))
 				{
-					sprite_index = spr_snick_exe_lungestart;
+					sprite_index = other.sr("spr_snick_exe_lungestart");
 					image_index = 0;
 				}
 				
-				if (floor(image_index) == (image_number - 1) && sprite_index == spr_snick_exe_lungestart)
-					sprite_index = spr_snick_exe_lunge;
+				if floor(image_index) == (image_number - 1) && sprite_index == other.sr("spr_snick_exe_lungestart")
+					sprite_index = other.sr("spr_snick_exe_lunge");
 			}
 			else
 			{
-				if (sprite_index != spr_snick_exe_lungeend && sprite_index != spr_snick_exe)
+				if sprite_index != other.sr("spr_snick_exe_lungeend") && sprite_index != spr_snick_exe
 				{
-					sprite_index = spr_snick_exe_lungeend;
+					sprite_index = other.sr("spr_snick_exe_lungeend");
 					image_index = 0;
 				}
 				
-				if (floor(image_index) == (image_number - 1) && sprite_index == spr_snick_exe_lungeend)
+				if floor(image_index) == (image_number - 1) && sprite_index == other.sr("spr_snick_exe_lungeend")
 					sprite_index = spr_snick_exe;
-			} */
+			}
 
 			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42)
 			{
@@ -416,6 +480,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				x = room_width / 2;
 				y = -100;
 			}
+			
+			/* if instance_exists(obj_parryhitbox)
+			{
+				var check = point_in_rectangle(obj_parryhitbox.x, obj_parryhitbox.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale));
+				if check
+					obj_parryhitbox.event_user(0);
+			} */
 			
 			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
 				scr_hurtplayer(playerid);
@@ -435,6 +506,20 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		if addseconds <= 0 && !instance_exists(obj_fadeout)
 		{
+			if tseconds <= 0 && candie
+			{
+				with obj_player1
+				{
+					instance_destroy(obj_fadeout);
+					targetDoor = "A";
+					room = timesuproom;
+					state = 64;
+					sprite_index = spr_Timesup;
+					image_index = 0;
+					audio_stop_all();
+					scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
+				}
+			}
 			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
@@ -457,7 +542,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					if d.type == 0
 					{
 						var _spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
-						sprite_set_speed(_spr, 60, 60);
+						sprite_set_speed(_spr, 60, spritespeed_framespersecond);
 						variable_global_set(string_replace_all(d.name, ".png", ""), _spr);
 					}
 					else if d.type == 1
@@ -499,21 +584,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_set_color(_check ? c_red : c_white);
 		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
-		
-		/* if tseconds <= 0
-		{
-			with obj_player1
-			{
-				instance_destroy(obj_fadeout);
-				targetDoor = "A";
-				room = timesuproom;
-				state = 64;
-				sprite_index = spr_Timesup;
-				image_index = 0;
-				audio_stop_all();
-				scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
-			}
-		} */
 		
 		for (var  len = array_length(postivenumbers), i = len - 1; i >= 0; i--)
 		{
@@ -599,15 +669,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			break;
 		}
 		
-		if instance_exists(obj_lapportalentrance)
+		if instance_exists(obj_lapportalentrance) && global.laps >= 2
 		{
-			if global.laps == 2
-			{
-				global.fill = 0;
-				lapsong = "mu_lap3_2";
-			}
-			else if global.laps >= 3
-				lapsong = "mu_lap4_v2";
+			global.fill = 0;
+			lapsong = global.laps >= 3 ? "mu_lap4_v2" : "mu_lap3_2";
 			
 			if !audio_is_playing(sr(lapsong))
 			{
@@ -627,6 +692,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				number : "+" + string(addseconds)
 			});
 		}
+		
+		candie = true;
+		// tseconds -= 4;
 	;'
 	docommand("reload_gml");
 }
