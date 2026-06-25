@@ -394,7 +394,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				else if d.type == 2 && asset_get_index(d.spritename) != -1
 				{
 					sprite_replace(asset_get_index(d.spritename), d.name, d.frames, false, false, d.xo, d.yo);
-					global.bigfont = font_add_sprite_ext(spr_font, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
+					global.bigfontTIMER = font_add_sprite_ext(spr_font, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
 				}
 				ds_queue_dequeue(download_queue);
 			} 
@@ -576,7 +576,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if global.laps < 3 || room == timesuproom || room == rank_room
 			exit;
 		
-		draw_set_font(global.bigfont);
+		draw_set_font(global.bigfontTIMER);
 		draw_set_alpha(1);
 		
 		draw_set_valign(fa_middle);
