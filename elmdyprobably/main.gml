@@ -226,7 +226,7 @@ global.lap4times =
 	strongcold_9 : 6,
 	strongcold_10 : 3,
 
-	normalT_treasure : 2,
+	normalT_treasure : 5,
 	normalT_room6 : 2,
 	normalT_room5 : 3,
 	normalT_room4 : 4,
@@ -236,7 +236,7 @@ global.lap4times =
 	normalT_runbackpassage : 1,
 	tutorial_room1 : 4,
 	
-	desert_16 : 3,
+	desert_16 : 5,
 	desert_11 : 3,
 	desert_10 : 4,
 	desert_9 : 4,
@@ -259,6 +259,11 @@ global.lap4times =
 	dragonlair_7 : 3,
 	dragonlair_8 : 10,
 	dragonlair_9 : 4
+};
+
+global.visitedrooms = 
+{
+
 };
 
 instance_destroy(obj_custom_object_ext);
@@ -336,6 +341,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/gaintime.ogg", "sfx_gaintime.ogg");
 	
 	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", "spr_bigfont.png", 69);
 	s = 1 / 60;
@@ -417,8 +423,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if global.laps < 3 || room == timesuproom || room == rank_room
 		{
 			offset = -200;
+			tseconds = 0;
 			candie = false;
-			// tseconds = 5; // this shitty fix will make me kill myself soon
+			global.visitedrooms = {};
 			exit;
 		}
 		
@@ -510,6 +517,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			{
 				with obj_player1
 				{
+					instance_destroy(obj_pizzaface);
 					instance_destroy(obj_fadeout);
 					targetDoor = "A";
 					room = timesuproom;
@@ -681,8 +689,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
-		if global.laps >= 3 && global.lap4times[$ room_get_name(room)] != undefined
+		if global.laps >= 3 && global.lap4times[$ room_get_name(room)] != undefined && global.visitedrooms[$ room_get_name(room)] == undefined
 		{
+			scr_soundeffect(sr("sfx_gaintime"));
 			addseconds = global.lap4times[$ room_get_name(room)];
 			array_push(postivenumbers,
 			{
@@ -694,7 +703,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 		
 		candie = true;
-		// tseconds -= 4;
+		
+		global.visitedrooms[$ room_get_name(room)] = 1;
 	;'
 	docommand("reload_gml");
 }
