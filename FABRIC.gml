@@ -75,6 +75,20 @@ with (instance_create(0, 0, obj_custom_object))
 		else
 			return v;
 	}
+	for (var mods_name = file_find_first(path + "*",0);mods_name != "";mods_name = file_find_next())
+	{
+		var _path = path + mods_name;
+		if file_exists(_path + "/mod.json")
+			var jsonstruct = json_parse(scr_load_file(_path + "/mod.json"));
+		if file_exists(_path + "/icon.png")
+			icon = sprite_add(_path + "/icon.png", 0, 0, 0, 0, 0);
+		else
+			icon = spr_null;
+		ini_open(_path + "/mod.ini");
+		array_push(mods, new Mod(_path, file_exists(_path + "/mod.json") ? jsonstruct.name : mods_name, file_exists(_path + "/mod.json") ? jsonstruct.desc : "Description is missing.", ini_read_real("Mod", "enabled", 0), icon));
+		ini_close();
+	}
+	file_find_close();
 	drawgui_event = @'
 		draw_set_color(c_black);
 		draw_set_alpha(0.5);
@@ -130,20 +144,6 @@ with (instance_create(0, 0, obj_custom_object))
 		
 		if array_length(mods) == 0
 		{
-			for (var mods_name = file_find_first(path + "*",0);mods_name != "";mods_name = file_find_next())
-			{
-				var _path = path + mods_name;
-				if file_exists(_path + "/mod.json")
-					var jsonstruct = json_parse(scr_load_file(_path + "/mod.json"));
-				if file_exists(_path + "/icon.png")
-					icon = sprite_add(_path + "/icon.png", 0, 0, 0, 0, 0);
-				else
-					icon = spr_null;
-				ini_open(_path + "/mod.ini");
-				array_push(mods, new Mod(_path, file_exists(_path + "/mod.json") ? jsonstruct.name : mods_name, file_exists(_path + "/mod.json") ? jsonstruct.desc : "Description is missing.", ini_read_real("Mod", "enabled", 0), icon));
-				ini_close();
-			}
-			file_find_close();
 			if key_slap
 			{
 				instance_destroy();
