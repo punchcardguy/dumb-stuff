@@ -11,7 +11,36 @@ with (instance_create(0, 0, obj_custom_object))
 	image_alpha = 0;
 	depth = -9999;
 	mods = [];
-	path = "C:/Users/epicg/Documents/pizza tower android/mods" 
+	get_user_folder = function()
+	{
+		var startPath = ""
+		if (os_type == os_android)
+		{
+			var temp = string_split(game_save_id, "/")
+			var first_index = array_get_index("data", temp)
+			startPath = "/storage/emulated/" + temp[first_index + 2]
+		} 
+		else
+		{
+			var temp = string_split(working_directory, "\\")
+			startPath = "C:/Users/" + temp[3]
+		}
+		return startPath + "/Documents/pizza tower android/"
+	}
+	game_directory = get_user_folder()
+	path = game_directory + "mods" + "/" 
+	if (!directory_exists(game_directory))
+		directory_create(game_directory);
+	if (!directory_exists(path))
+		directory_create(path);
+	ini_open(game_directory + "modloader_user.ini");
+	var saved_path = ini_read_string("General", "saved_path", "")
+	if saved_path != path
+	{
+		get_string_async("(This system was made by hoy_es_diciembre_1225 this code is being used for temporary purposes) Heya!\nJust to let you know that the afom folder is " + (saved_path == "" ? "" : "now ") + "located in:", path)
+		ini_write_string("General", "saved_path", string(path))
+	}
+	ini_close();
 	selected = 0;
 	scrolling = 0;
 	quote = @'"';
