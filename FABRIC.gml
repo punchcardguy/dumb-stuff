@@ -172,7 +172,12 @@ with (instance_create(0, 0, obj_custom_object))
 					for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
 					{
 						if asset_get_index(object_names) != -1 || global.customObjects[$ object_names] != undefined
-							show_message_async("Cannot have a object with the same name as an already existing object");
+						{
+							show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
+							continue;
+						}
+						
+						show_message_async(object_names);
 					}
 				}
 				
