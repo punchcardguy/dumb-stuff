@@ -62,24 +62,7 @@ with (instance_create(0, 0, obj_custom_object))
 				}
 			}
 			file_find_close();
-			if ext == "folder" 
-				array_push(fileArray, currDir);
-			if ext != "folder" 
-			{
-				for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
-				{
-					if !directory_exists(currDir + file)
-					{
-						if string_pos(".png", currDir + file) == 0
-							continue;
-						array_push(fileArray, [currDir + file, file]);
-					} 
-				} 
-				file_find_close();
-			}
 		}
-		if ext == "folder" 
-			array_delete(fileArray, 0, 1);
 		
 		return fileArray;
 	}
