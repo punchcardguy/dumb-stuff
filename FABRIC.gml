@@ -16,13 +16,13 @@ with (instance_create(0, 0, obj_custom_object))
 		var startPath = ""
 		if (os_type == os_android)
 		{
-			var temp = string_split(game_save_id, "/")
+			var temp = string_split(game_save_id, "/", true)
 			var first_index = array_get_index("data", temp)
 			startPath = "/storage/emulated/" + temp[first_index + 2]
 		} 
 		else
 		{
-			var temp = string_split(working_directory, "\\")
+			var temp = string_split(working_directory, "\\", true)
 			startPath = "C:/Users/" + temp[3]
 		}
 		return startPath + "/Documents/pizza tower android/"
@@ -30,9 +30,9 @@ with (instance_create(0, 0, obj_custom_object))
 	game_directory = get_user_folder()
 	path = game_directory + "mods" + "/" ;
 	if (!directory_exists(game_directory))
-		directory_create(game_directory);
+		directory_create(game_directory)
 	if (!directory_exists(path))
-		directory_create(path);
+		directory_create(path)
 	ini_open(game_directory + "modloader_user.ini");
 	var saved_path = ini_read_string("General", "saved_path", "")
 	if saved_path != path
@@ -78,7 +78,8 @@ with (instance_create(0, 0, obj_custom_object))
 		else
 			return v;
 	}
-	for (var mods_name = file_find_first(path + "*",0);mods_name != "";mods_name = file_find_next())
+	
+	for (var mods_name = file_find_first(path + "*", fa_directory);mods_name != "";mods_name = file_find_next())
 	{
 		var _path = path + mods_name;
 		if file_exists(_path + "/mod.json")
