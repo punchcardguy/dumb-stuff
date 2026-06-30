@@ -1,3 +1,5 @@
+// this code base is horrible to work with
+
 characters = {}; // character code : struct
 
 instance_destroy(obj_custom_object);
@@ -9,63 +11,10 @@ with (instance_create(0, 0, obj_custom_object))
 	image_alpha = 0;
 	depth = -9999;
 	mods = [];
-	get_user_folder = function()
-	{
-		var startPath = ""
-		if (os_type == os_android)
-		{
-			var temp = string_split(game_save_id, "/")
-			var first_index = array_get_index("data", temp)
-			startPath = "/storage/emulated/" + temp[first_index + 2]
-		} 
-		else
-		{
-			var temp = string_split(working_directory, "\\")
-			startPath = "C:/Users/" + temp[3]
-		}
-		return startPath + "/Documents/pizza tower android/"
-	}
-	game_directory = get_user_folder()
-	path = game_directory + "mods" + "/" 
-	if (!directory_exists(game_directory))
-		directory_create(game_directory);
-	if (!directory_exists(path))
-		directory_create(path);
-	ini_open(game_directory + "modloader_user.ini");
-	var saved_path = ini_read_string("General", "saved_path", "")
-	if saved_path != path
-	{
-		get_string_async("(This system was made by hoy_es_diciembre_1225 this code is being used for temporary purposes) Heya!\nJust to let you know that the afom folder is " + (saved_path == "" ? "" : "now ") + "located in:", path)
-		ini_write_string("General", "saved_path", string(path))
-	}
-	ini_close();
+	path = "C:/Users/epicg/Documents/pizza tower android/mods" 
 	selected = 0;
 	scrolling = 0;
 	quote = @'"';
-	find_files_recursive = function(folder, ext, max)
-	{
-		var dirQueue = ds_queue_create();
-		var fileArray = [];
-		ds_queue_enqueue(dirQueue, folder);
-		var startDepth = string_count("/", folder);
-		
-		while !ds_queue_empty(dirQueue)
-		{
-			var currDir = ds_queue_dequeue(dirQueue);
-			for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
-			{
-				var check = fold + "/";
-				if directory_exists(currDir + check)
-				{
-					if max == undefined or string_count("/", currDir + check) - startDepth <= max
-						ds_queue_enqueue(dirQueue, currDir + check);
-				}
-			}
-			file_find_close();
-		}
-		
-		return fileArray;
-	}
 	
 	scr_load_file = function(filename)
 	{
@@ -90,7 +39,7 @@ with (instance_create(0, 0, obj_custom_object))
 		icon = _icon;
 	}
 	
-	editorTreeMin = function(v, max)
+	editorTreeMin = function(v, max) // is this just cycle?
 	{
 		if v > max
 			return max + (max - v);
