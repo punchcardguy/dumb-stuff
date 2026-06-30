@@ -28,7 +28,7 @@ with (instance_create(0, 0, obj_custom_object))
 		return startPath + "/Documents/pizza tower android/"
 	}
 	game_directory = get_user_folder()
-	path = game_directory + "mods" + "/" 
+	path = game_directory + "mods" + "/" ;
 	if (!directory_exists(game_directory))
 		directory_create(game_directory);
 	if (!directory_exists(path))
@@ -41,6 +41,9 @@ with (instance_create(0, 0, obj_custom_object))
 		ini_write_string("General", "saved_path", string(path))
 	}
 	ini_close();
+	
+	show_message_async(path);
+	
 	selected = 0;
 	scrolling = 0;
 	quote = @'"';
