@@ -28,6 +28,7 @@ with (instance_create(0, 0, obj_custom_object))
 		}
 		return startPath + "/Documents/pizza tower android/"
 	}
+	
 	game_directory = get_user_folder()
 	path = game_directory + "mods" + "/" ;
 	if (!directory_exists(game_directory))
@@ -70,6 +71,38 @@ with (instance_create(0, 0, obj_custom_object))
 		enabled = _enabled;
 		was_enabled = _enabled;
 		icon = _icon;
+	}
+	
+	find_files_recursive = function(folder, ext, max)
+	{
+		var dirQueue = ds_queue_create();
+		var fileArray = [];
+		ds_queue_enqueue(dirQueue, folder);
+		var startDepth = string_count("/", folder);
+		
+		while !ds_queue_empty(dirQueue)
+		{
+			var currDir = ds_queue_dequeue(dirQueue);
+			for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
+			{
+				var check = fold + "/";
+				if directory_exists(currDir + check)
+				{
+					if max == undefined or string_count("/", currDir + check) - startDepth <= max
+						ds_queue_enqueue(dirQueue, currDir + check);
+				}
+			}
+			file_find_close();
+			
+			for (var file = file_find_first(currDir + "*" + ext, 0); file != ""; file = file_find_next())
+			{
+				if !directory_exists(currDir + file)
+					array_push(fileArray, currDir + file);
+			}
+			file_find_close();
+		}
+		
+		return fileArray;
 	}
 	
 	editorTreeMin = function(v, max) // is this just cycle?
@@ -177,7 +210,16 @@ with (instance_create(0, 0, obj_custom_object))
 							continue;
 						}
 						
-						show_message_async(object_names);
+						global.customObjects[$ object_names] = 
+						{
+							file_path : m.file_path + "/objects/" + object_names + "/"
+						};
+					}
+					
+					for (var j = 0, names = variable_struct_get_names(global.customObjects), len = array_length(names); j < len; j++)
+					{
+						for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", fa_directory); event_names != ""; event_names = file_find_next())
+							show_message_async(global.customObjects[$ names[j]].file_path + event_names);
 					}
 				}
 				
