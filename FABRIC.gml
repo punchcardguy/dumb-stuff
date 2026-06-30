@@ -1,7 +1,3 @@
-gml 
-
-// UNFINISHED DO NOT USE
-
 characters = {}; // character code : struct
 
 instance_destroy(obj_custom_object);
@@ -45,17 +41,80 @@ with (instance_create(0, 0, obj_custom_object))
 	ini_close();
 	selected = 0;
 	scrolling = 0;
-	tabs = ["MODS", "INFO", "SETTINGS"]
-	tab = 0;
 	quote = @'"';
-	drawgui_event = @'
-		editorTreeMin = function(v, max)
+	find_files_recursive = function(folder, ext, max)
+	{
+		var dirQueue = ds_queue_create();
+		var fileArray = [];
+		ds_queue_enqueue(dirQueue, folder);
+		var startDepth = string_count("/", folder);
+		
+		while !ds_queue_empty(dirQueue)
 		{
-			if v > max
-				return max + (max - v);
-			else
-				return v;
+			var currDir = ds_queue_dequeue(dirQueue);
+			for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
+			{
+				var check = fold + "/";
+				if directory_exists(currDir + check)
+				{
+					if max == undefined or string_count("/", currDir + check) - startDepth <= max
+						ds_queue_enqueue(dirQueue, currDir + check);
+				}
+			}
+			file_find_close();
+			if ext == "folder" 
+				array_push(fileArray, currDir);
+			if ext != "folder" 
+			{
+				for (var file = file_find_first(currDir + "*" + ext, 0);file != "";file = file_find_next())
+				{
+					if !directory_exists(currDir + file)
+					{
+						if string_pos(".png", currDir + file) == 0
+							continue;
+						array_push(fileArray, [currDir + file, file]);
+					} 
+				} 
+				file_find_close();
+			}
 		}
+		if ext == "folder" 
+			array_delete(fileArray, 0, 1);
+		
+		return fileArray;
+	}
+	
+	scr_load_file = function(filename)
+	{
+		var _gml = "";
+		if file_exists(filename)
+		{
+			var _file = buffer_load(filename);
+			if buffer_get_size(_file) > 0
+				_gml = buffer_read(_file, buffer_string);
+			buffer_delete(_file); 
+		}
+		return _gml;
+	}
+	
+	Mod = function(_file_path, _name, _desc, _enabled, _icon) constructor // constructors my beloved
+	{
+		file_path = _file_path;
+		name = _name;
+		desc = _desc;
+		enabled = _enabled;
+		was_enabled = _enabled;
+		icon = _icon;
+	}
+	
+	editorTreeMin = function(v, max)
+	{
+		if v > max
+			return max + (max - v);
+		else
+			return v;
+	}
+	drawgui_event = @'
 		draw_set_color(c_black);
 		draw_set_alpha(0.5);
 	    draw_rectangle(960,0,-100,540,false); 
@@ -94,11 +153,6 @@ with (instance_create(0, 0, obj_custom_object))
 			draw_set_valign(fa_top);
 	        draw_set_font(global.creditsfont);
 			draw_set_halign(fa_left);
-			for(var i = 0;i < array_length(tabs);i++)
-			{
-				draw_set_color(i == tab ? c_white : c_gray);
-				draw_text(string_width(tabs[i]) + i * 30, 5, tabs[i]);
-			}
 		} 
 		else
 		{
@@ -112,50 +166,7 @@ with (instance_create(0, 0, obj_custom_object))
 	';
 	step_event = @'
 		scr_getinput();
-		static find_files_recursive = function(folder, ext, max)
-		{
-		    var dirQueue = ds_queue_create();
-		    var fileArray = [];
-		    ds_queue_enqueue(dirQueue, folder);
-		    var startDepth = string_count("/", folder);
-		    
-		    while !ds_queue_empty(dirQueue)
-		    {
-		        var currDir = ds_queue_dequeue(dirQueue);
-		        for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
-		        {
-		            var check = fold + "/";
-		            if directory_exists(currDir + check)
-		            {
-		                if max == undefined or string_count("/", currDir + check) - startDepth <= max
-		                    ds_queue_enqueue(dirQueue, currDir + check);
-		            }
-		        }
-		        file_find_close();
-
-		    return fileArray;
-		}
-		scr_load_file = function(filename)
-		{
-			var _gml = "";
-			if file_exists(filename)
-			{
-				var _file = buffer_load(filename);
-				if buffer_get_size(_file) > 0
-					_gml = buffer_read(_file, buffer_string);
-				buffer_delete(_file); 
-			}
-			return _gml;
-		}
-		Mod = function(_file_path, _name, _desc, _enabled, _icon) constructor // constructors my beloved
-		{
-			file_path = _file_path;
-			name = _name;
-			desc = _desc;
-			enabled = _enabled;
-			was_enabled = _enabled;
-			icon = _icon;
-		}
+		
 		if array_length(mods) == 0
 		{
 			for (var mods_name = file_find_first(path + "*",0);mods_name != "";mods_name = file_find_next())
@@ -203,7 +214,7 @@ with (instance_create(0, 0, obj_custom_object))
 					api += string("globalvar MOD_PATH = \"" + m.file_path + "\";#globalvar MOD_GLOBAL = {};#");
 					var snippet = live_snippet_create(string_hash_to_newline(api + "#") + scr_load_file(m.file_path + "/init.gml"));
 					if live_snippet_call(snippet){} else get_string_async("Your mod fucked up!", "Runtime error for mod : " + quote + m.name + quote  + " in init.gml\n" + global.live_result); 
-				} 
+				}
 				else if m.was_enabled != m.enabled && !m.enabled && file_exists(m.file_path + "/cleanup.gml")
 				{
 					var api = "";
