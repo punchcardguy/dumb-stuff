@@ -1,6 +1,7 @@
 // this code base is horrible to work with
 
-characters = {}; // character code : struct
+global.characters = {}; // character code : struct
+global.customObjects = {};
 
 instance_destroy(obj_custom_object);
 instance_destroy(obj_custom_object_ext);
@@ -99,7 +100,7 @@ with (instance_create(0, 0, obj_custom_object))
 	    draw_rectangle(960,0,-100,540,false); 
 		if array_length(mods) > 0
 		{
-	        for(var i = 0;i < array_length(mods);i++)
+	        for (var i = 0; i < array_length(mods); i++)
 	        {
 		        var m = mods[i];
 				draw_set_alpha(1);
@@ -162,9 +163,19 @@ with (instance_create(0, 0, obj_custom_object))
 		}
         if key_slap
         {
-	        for (var i = 0;i < array_length(mods);i++)
+	        for (var i = 0, len = array_length(mods); i < len; i++)
 			{
 				var m = mods[i];
+				
+				if directory_exists(m.file_path + "/objects")
+				{
+					for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
+					{
+						if asset_get_index(object_names) != -1 || global.customObjects[$ object_names] != undefined
+							show_message_async("Cannot have a object with the same name as an already existing object");
+					}
+				}
+				
 				if m.enabled && file_exists(m.file_path + "/init.gml")
 				{
 					var api = "";
