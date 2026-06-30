@@ -124,14 +124,6 @@ with (instance_create(0, 0, obj_custom_object))
 			draw_set_valign(fa_bottom);
 			draw_text_ext_transformed(display_get_gui_width()/2, 500 + string_height(string_upper(mods[selected].desc)), string_upper(mods[selected].desc), 16, 900, 1, 1, 0);
 			draw_sprite_stretched(mods[selected].icon, 0,  display_get_gui_width() - 120, 70, 100, 100);
-			draw_set_color(c_black);
-			draw_set_alpha(0.5);
-		    draw_rectangle(0,0,960,50,false);
-			draw_set_color(c_white);
-			draw_set_alpha(1);
-			draw_set_valign(fa_top);
-	        draw_set_font(global.creditsfont);
-			draw_set_halign(fa_left);
 		} 
 		else
 		{
