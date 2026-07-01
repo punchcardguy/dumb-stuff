@@ -236,8 +236,10 @@ with (instance_create(0, 0, obj_custom_object))
 							instance_create(_x, _y, _obj);
 						else
 						{
-							with instance_create(_x, _y, obj_custom_object)
+							myobj = instance_create(_x, _y, obj_custom_object);
+							with myobj
 							{
+								sprite = 0;
 								if _obj.events[$ "create"] != undefined
 								{
 									snippet = live_snippet_create(_obj.events.create);
@@ -245,6 +247,8 @@ with (instance_create(0, 0, obj_custom_object))
 									_func(snippet);
 							 	}
 							}
+							
+							return myobj;
 						}
 					});
 					var api = "";
