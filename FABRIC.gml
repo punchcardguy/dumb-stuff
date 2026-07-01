@@ -221,6 +221,8 @@ with (instance_create(0, 0, obj_custom_object))
 					{
 						for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", fa_directory); event_names != ""; event_names = file_find_next())
 							global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
+						
+						live_constant_add(names[j], global.customObjects[$ names[j]]);
 					}
 					
 					get_string_async(global.customObjects, global.customObjects);
@@ -228,6 +230,23 @@ with (instance_create(0, 0, obj_custom_object))
 				
 				if m.enabled && file_exists(m.file_path + "/init.gml")
 				{
+					live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
+					{
+						if !is_struct(_obj)
+							instance_create(_x, _y, _obj);
+						else
+						{
+							with instance_create(_x, _y, obj_custom_object)
+							{
+								if _obj.events[$ "create"] != undefined
+								{
+									snippet = live_snippet_create(_obj.events.create);
+									_func = asset_get_index(script_get_name(method(self, live_snippet_call))); // prevent game from going bat shit insane
+									_func(snippet);
+							 	}
+							}
+						}
+					});
 					var api = "";
 					api += string("globalvar MOD_PATH = \"" + m.file_path + "\";#globalvar MOD_GLOBAL = {};#");
 					var snippet = live_snippet_create(string_hash_to_newline(api + "#") + scr_load_file(m.file_path + "/init.gml"));
