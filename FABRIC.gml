@@ -227,11 +227,12 @@ with (instance_create(0, 0, obj_custom_object))
 						live_constant_add(names[j], global.customObjects[$ names[j]]);
 					}
 					
+					get_string_async(global.customObjects, "");
 				}
 				
 				if m.enabled && file_exists(m.file_path + "/init.gml")
 				{
-					live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
+					/* live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
 					{
 						if !is_struct(_obj)
 							instance_create(_x, _y, _obj);
@@ -251,7 +252,7 @@ with (instance_create(0, 0, obj_custom_object))
 							
 							return myobj;
 						}
-					});
+					}); */
 					var api = "";
 					api += string("globalvar MOD_PATH = \"" + m.file_path + "\";#globalvar MOD_GLOBAL = {};#");
 					var snippet = live_snippet_create(string_hash_to_newline(api + "#") + scr_load_file(m.file_path + "/init.gml"));
