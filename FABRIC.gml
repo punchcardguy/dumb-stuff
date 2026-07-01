@@ -212,7 +212,8 @@ with (instance_create(0, 0, obj_custom_object))
 						
 						global.customObjects[$ object_names] = 
 						{
-							file_path : m.file_path + "/objects/" + object_names + "/"
+							file_path : m.file_path + "/objects/" + object_names + "/",
+							events : {}
 						};
 					}
 					
