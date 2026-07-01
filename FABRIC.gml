@@ -204,7 +204,7 @@ with (instance_create(0, 0, obj_custom_object))
 				{
 					for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
 					{
-						if asset_get_index(object_names) != -1 || global.customObjects[$ object_names] != undefined
+						if asset_get_index(object_names) != -1
 						{
 							show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
 							continue;
@@ -216,16 +216,17 @@ with (instance_create(0, 0, obj_custom_object))
 							events : {}
 						};
 					}
+					file_find_close();
 					
-					for (var j = 0, names = variable_struct_get_names(global.customObjects), len = array_length(names); j < len; j++)
+					for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
 					{
-						for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", fa_directory); event_names != ""; event_names = file_find_next())
+						for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
 							global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
+						file_find_close();
 						
 						// live_constant_add(names[j], global.customObjects[$ names[j]]);
 					}
 					
-					get_string_async(global.customObjects, global.customObjects);
 				}
 				
 				if m.enabled && file_exists(m.file_path + "/init.gml")
