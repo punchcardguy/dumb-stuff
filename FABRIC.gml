@@ -14,34 +14,41 @@ with (instance_create(0, 0, obj_custom_object))
 	mods = [];
 	get_user_folder = function()
 	{
-		var startPath = ""
+		var startPath = "";
+		
 		if (os_type == os_android)
 		{
-			var temp = string_split(game_save_id, "/", true)
-			var first_index = array_get_index("data", temp)
-			startPath = "/storage/emulated/" + temp[first_index + 2]
+			var temp = string_split(game_save_id, "/");
+			var first_index = array_get_index("data", temp);
+			startPath = "/storage/emulated/" + temp[first_index + 2];
 		} 
 		else
 		{
-			var temp = string_split(working_directory, "\\", true)
-			startPath = "C:/Users/" + temp[3]
+			var temp = string_split(working_directory, "\\", true);
+			startPath = "C:/Users/" + temp[3];
 		}
-		return startPath + "/Documents/pizza tower android/"
+		
+		return startPath + "/Documents/pizza tower android/";
 	}
 	
-	game_directory = get_user_folder()
-	path = game_directory + "mods" + "/" ;
-	if (!directory_exists(game_directory))
-		directory_create(game_directory)
-	if (!directory_exists(path))
-		directory_create(path)
+	game_directory = get_user_folder();
+	path = game_directory + "mods" + "/";
+	
+	if !directory_exists(game_directory)
+		directory_create(game_directory);
+	
+	if !directory_exists(path)
+		directory_create(path);
+	
 	ini_open(game_directory + "modloader_user.ini");
-	var saved_path = ini_read_string("General", "saved_path", "")
+	
+	var saved_path = ini_read_string("General", "saved_path", "");
 	if saved_path != path
 	{
-		get_string_async("(This system was made by hoy_es_diciembre_1225 this code is being used for temporary purposes) Heya!\nJust to let you know that the afom folder is " + (saved_path == "" ? "" : "now ") + "located in:", path)
-		ini_write_string("General", "saved_path", string(path))
+		get_string_async("(This system was made by hoy_es_diciembre_1225 this code is being used for temporary purposes) Heya!\nJust to let you know that the afom folder is " + (saved_path == "" ? "" : "now ") + "located in:", path);
+		ini_write_string("General", "saved_path", string(path));
 	}
+	
 	ini_close();
 	
 	show_message_async(path);
@@ -113,7 +120,7 @@ with (instance_create(0, 0, obj_custom_object))
 			return v;
 	}
 	
-	for (var mods_name = file_find_first(path + "*", fa_directory);mods_name != "";mods_name = file_find_next())
+	for (var mods_name = file_find_first(path + "*", fa_directory); mods_name != ""; mods_name = file_find_next())
 	{
 		var _path = path + mods_name;
 		if file_exists(_path + "/mod.json")
@@ -126,6 +133,7 @@ with (instance_create(0, 0, obj_custom_object))
 		array_push(mods, new Mod(_path, file_exists(_path + "/mod.json") ? jsonstruct.name : mods_name, file_exists(_path + "/mod.json") ? jsonstruct.desc : "Description is missing.", ini_read_real("Mod", "enabled", 0), icon));
 		ini_close();
 	}
+	
 	file_find_close();
 	drawgui_event = @'
 		draw_set_color(c_black);
@@ -187,6 +195,7 @@ with (instance_create(0, 0, obj_custom_object))
         selected += move;
 		scrolling = lerp(scrolling,selected,0.1);
         selected = cycle(selected, 0, array_length(mods));
+		
         if key_jump
         {
 	        mods[selected].enabled = !mods[selected].enabled;
@@ -194,6 +203,7 @@ with (instance_create(0, 0, obj_custom_object))
 			ini_write_real("Mod", "enabled", mods[selected].enabled);
 			ini_close();
 		}
+		
         if key_slap
         {
 	        for (var i = 0, len = array_length(mods); i < len; i++)
@@ -207,7 +217,7 @@ with (instance_create(0, 0, obj_custom_object))
 						if asset_get_index(object_names) != -1
 						{
 							show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
-							continue;
+							break;
 						}
 						
 						global.customObjects[$ object_names] = 
