@@ -210,38 +210,38 @@ with (instance_create(0, 0, obj_custom_object))
 			{
 				var m = mods[i];
 				
-				if directory_exists(m.file_path + "/objects")
+				if m.enabled
 				{
-					for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
+					if directory_exists(m.file_path + "/objects")
 					{
-						if asset_get_index(object_names) != -1
+						for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
 						{
-							show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
-							break;
+							if asset_get_index(object_names) != -1
+							{
+								show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
+								break;
+							}
+							
+							global.customObjects[$ object_names] = 
+							{
+								file_path : m.file_path + "/objects/" + object_names + "/",
+								events : {}
+							};
 						}
-						
-						global.customObjects[$ object_names] = 
-						{
-							file_path : m.file_path + "/objects/" + object_names + "/",
-							events : {}
-						};
-					}
-					file_find_close();
-					
-					for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
-					{
-						for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
-							global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
 						file_find_close();
 						
-						live_constant_add(names[j], global.customObjects[$ names[j]]);
+						for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
+						{
+							for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
+								global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
+							file_find_close();
+							
+							live_constant_add(names[j], global.customObjects[$ names[j]]);
+						}
+						
+						get_string_async(global.customObjects, "");
 					}
 					
-					get_string_async(global.customObjects, "");
-				}
-				
-				if m.enabled && file_exists(m.file_path + "/init.gml")
-				{
 					/* live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
 					{
 						if !is_struct(_obj)
@@ -263,10 +263,14 @@ with (instance_create(0, 0, obj_custom_object))
 							return myobj;
 						}
 					}); */
-					var api = "";
-					api += string("globalvar MOD_PATH = \"" + m.file_path + "\";#globalvar MOD_GLOBAL = {};#");
-					var snippet = live_snippet_create(string_hash_to_newline(api + "#") + scr_load_file(m.file_path + "/init.gml"));
-					if live_snippet_call(snippet){} else get_string_async("Your mod fucked up!", "Runtime error for mod : " + quote + m.name + quote  + " in init.gml\n" + global.live_result); 
+					
+					if file_exists(m.file_path + "/init.gml")
+					{
+						var api = "";
+						api += string("globalvar MOD_PATH = \"" + m.file_path + "\";#globalvar MOD_GLOBAL = {};#");
+						var snippet = live_snippet_create(string_hash_to_newline(api + "#") + scr_load_file(m.file_path + "/init.gml"));
+						if live_snippet_call(snippet){} else get_string_async("Your mod fucked up!", "Runtime error for mod : " + quote + m.name + quote  + " in init.gml\n" + global.live_result);
+					}
 				}
 				else if m.was_enabled != m.enabled && !m.enabled && file_exists(m.file_path + "/cleanup.gml")
 				{
