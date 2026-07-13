@@ -237,7 +237,7 @@ with (instance_create(0, 0, obj_custom_object))
 								global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
 							file_find_close();
 							
-							live_constant_add(names[j], global.customObjects[$ names[j]]);
+							gml_const_add(names[j], global.customObjects[$ names[j]]);
 						}
 						
 						// get_string_async(global.customObjects, "");
