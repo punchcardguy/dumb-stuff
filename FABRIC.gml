@@ -204,7 +204,7 @@ with (instance_create(0, 0, obj_custom_object))
 			ini_close();
 		}
 		
-        if key_slap
+        if key_slap2
         {
 	        for (var i = 0, len = array_length(mods); i < len; i++)
 			{
@@ -228,6 +228,7 @@ with (instance_create(0, 0, obj_custom_object))
 								events : {}
 							};
 						}
+						
 						file_find_close();
 						
 						for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
@@ -236,10 +237,10 @@ with (instance_create(0, 0, obj_custom_object))
 								global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
 							file_find_close();
 							
-							live_constant_add(names[j], global.customObjects[$ names[j]]);
+							// live_constant_add(names[j], global.customObjects[$ names[j]]);
 						}
 						
-						get_string_async(global.customObjects, "");
+						// get_string_async(global.customObjects, "");
 					}
 					
 					/* live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
