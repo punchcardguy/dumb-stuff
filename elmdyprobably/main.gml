@@ -375,6 +375,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		image_number : 0
 	};
 	candie = false;
+	
+	oldsavedshit = [ds_list_create(), ds_list_create(), ds_list_create()];
+	shittosave = [global.saveroom, global.escaperoom, global.baddieroom];
+	toppins = ["shroomfollow", "cheesefollow", "tomatofollow", "sausagefollow", "pineapplefollow"];
+	saveddata = {};
+	
 	event.step[0] = @'
 		ind += 0.35;
 		
@@ -425,6 +431,43 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		with obj_lapportalentrance if sprite_index == spr_pizzaportal_disappear && image_index == 0 && !global.oldsprites 
 			scr_soundeffect(sfx_lapexit);
+		
+		if room == timesuproom && obj_player.state == 89 && obj_player.y > ((room_height * 2) - 30)
+		{
+			obj_player.state = 146;
+			global.collect = saveddata.savedscore;
+			global.combo = saveddata.savedcombo;
+			global.comboscore = saveddata.savedcomboscore;
+			global.combotime = saveddata.savedcombotime;
+			global.panic = true;
+			global.laps = saveddata.savedlaps;
+			obj_player.targetRoom = saveddata.savedroom;
+			obj_player.targetDoor = "LAP";
+			obj_player.isgustavo = false;
+			
+			for (var k = 0, len = array_length(saveddata.savedtoppins); k < len; k++)
+				variable_global_set(toppins[k], saveddata.savedtoppins[k]);
+			
+			for (var i = 0, len = array_length(shittosave); i < len ;i++) 
+			{
+				ds_list_clear(shittosave[i]);
+				ds_list_copy(shittosave[i], oldsavedshit[i]);
+			} 
+			
+			instance_create(0, 0, obj_fadeout);
+			
+			obj_tv.sprite_index = saveddata.tv_sprite;
+			obj_tv.state = saveddata.tv_state;
+			obj_tv.expressionsprite = saveddata.tv_expressionsprite;
+			obj_tv.expressionbuffer = saveddata.tv_expressionbuffer;
+			
+			obj_player.cutscene = false;
+			obj_player.alarm[10] = -1;
+			
+			instance_destroy(obj_combotitle);
+			instance_destroy(obj_comboend);
+			instance_destroy(obj_sandparticle);
+		}
 		
 		if global.laps < 3 || room == timesuproom || room == rank_room
 		{
@@ -711,6 +754,27 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		if instance_exists(obj_lapportalentrance) && global.laps >= 2
 		{
+			saveddata =
+			{
+				savedscore : global.collect, 
+				savedcomboscore : global.comboscore,
+				savedcombo : global.combo, 
+				savedcombotime : global.combotime, 
+				savedlaps : global.laps, 
+				savedroom : room, 
+				savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
+				tv_expressionsprite : obj_tv.expressionsprite,
+				tv_expressionbuffer : obj_tv.expressionbuffer,
+				tv_state : obj_tv.state,
+				tv_sprite : obj_tv.sprite_index
+			}
+			
+			for (var i = 0, len = array_length(shittosave); i < len; i++) 
+			{
+				ds_list_clear(oldsavedshit[i]);
+				ds_list_copy(oldsavedshit[i], shittosave[i]);
+			} 
+
 			global.fill = 0;
 			lapsong = "mu_lap3_2";
 			
