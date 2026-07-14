@@ -432,6 +432,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			tseconds = 0;
 			candie = false;
 			global.visitedrooms = {};
+			if !instance_exists(obj_wartimer)
+				instance_destroy(obj_warshader);
 			exit;
 		}
 		
@@ -715,7 +717,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if global.laps >= 3
 			{
 				lapsong = "mu_lap4_v2";
-				instance_create(0, 0, obj_warshader).persistent = true;
+				instance_create_depth(0, 0, layer_get_id("Backgrounds_1") != -1 ? layer_get_depth(layer_get_id("Backgrounds_1")) - 1 : 200, obj_warshader).persistent = true;
 			}
 			
 			if !audio_is_playing(sr(lapsong))
