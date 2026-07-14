@@ -509,7 +509,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				addsecondstimer = 2;
 			}
 			
-			seconds = max(ceil(seconds), 0);
+			tseconds = max(ceil(tseconds), 0);
 		}
 		
 		if addseconds <= 0 && !instance_exists(obj_fadeout) && obj_player1.state != 137
