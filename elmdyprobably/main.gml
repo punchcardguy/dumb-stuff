@@ -307,13 +307,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		ds_queue_enqueue(download_queue, q);
 	}
 	
-	downloadFile_imsofuckinglazy = function(_file, _spritename, _filename, _frames = 1, xorigin = 0, yorigin = 0)
+	downloadFile_imsofuckinglazy = function(_file, _filename, _frames = 1, xorigin = 0, yorigin = 0)
 	{
 		var q =
 		{
 			file : _file, 
 			name : _filename,
-			spritename : _spritename,
 			frames : _frames,
 			xo : xorigin,
 			yo : yorigin,
@@ -343,7 +342,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/gaintime.ogg", "sfx_gaintime.ogg");
 	
-	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", "spr_bigfont.png", 69);
+	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", 69);
 	s = 1 / 60;
 	tseconds = 0;
 	prev_tseconds = 0;
@@ -393,8 +392,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
 				else if d.type == 2 && asset_get_index(d.spritename) != -1
 				{
-					sprite_replace(asset_get_index(d.spritename), d.name, d.frames, false, false, d.xo, d.yo);
-					global.bigfontTIMER = font_add_sprite_ext(spr_font, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
+					var spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
+					global.bigfontTIMER = font_add_sprite_ext(spr, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
 				}
 				ds_queue_dequeue(download_queue);
 			} 
