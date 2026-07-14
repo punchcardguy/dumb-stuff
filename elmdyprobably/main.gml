@@ -1,5 +1,11 @@
 gml
 
+with obj_drawcontroller
+{
+	bricklap3y = 0;
+	bricklap4y = 0;
+}
+
 global.lap4times =
 {
     entrance_10: 4,
@@ -335,7 +341,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lunge.png", "spr_snick_exe_lunge.png", 4, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungeend.png", "spr_snick_exe_lungeend.png", 5, 50, 50);
 	
-	// https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungestart.png
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_fallingbricksforefront.png", "bg_fallingbricksforefront.png");
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_pizzafacefallout.png", "bg_pizzafacefallout.png");
 	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
@@ -653,6 +660,26 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					draw_sprite(other.larpwarningspr, 0, x, y + Wave(-5, 5, 0.5, 5));
 			}
 		}
+		
+		with obj_drawcontroller
+		{
+			if room == timesuproom || room == rank_room || instance_exists(obj_ghostcollectibles)
+				exit;
+			
+			var b = get_dark(image_blend, use_dark);
+			
+			if global.laps >= 2
+			{
+				bricklap3y = (bricklap3y + 4) mod sprite_get_height(bg_fallingbricksforefront);
+				draw_sprite_tiled_ext(sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
+				
+				if global.laps >= 3
+				{
+					bricklap4y = (bricklap4y + 4) mod sprite_get_height(bg_pizzafacefallout);
+					draw_sprite_tiled_ext(sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
+				}
+			}
+		}
 	';
 	event.room_start[0] = @'
 		with snickexe
@@ -710,4 +737,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		global.visitedrooms[$ room_get_name(room)] = 1;
 	;'
 	docommand("reload_gml");
+}
+
+
+function scr_drawbricks()
+{
+ 
 }
