@@ -738,9 +738,3 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	;'
 	docommand("reload_gml");
 }
-
-
-function scr_drawbricks()
-{
- 
-}
