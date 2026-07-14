@@ -710,7 +710,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if instance_exists(obj_lapportalentrance) && global.laps >= 2
 		{
 			global.fill = 0;
-			lapsong = global.laps >= 3 ? "mu_lap4_v2" : "mu_lap3_2";
+			lapsong = "mu_lap3_2";
+			
+			if global.laps >= 3
+			{
+				lapsong = "mu_lap4_v2";
+				instance_create(0, 0, obj_warshader);
+			}
 			
 			if !audio_is_playing(sr(lapsong))
 			{
