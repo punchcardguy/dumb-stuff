@@ -717,7 +717,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if global.laps >= 3
 			{
 				lapsong = "mu_lap4_v2";
-				instance_create_depth(0, 0, layer_get_id("Backgrounds_1") != -1 ? layer_get_depth(layer_get_id("Backgrounds_1")) - 1 : 200, obj_warshader).persistent = true;
+				var arr = ["Backgrounds_1", "Backgrounds_Ground1", "Backgrounds_still1"];
+				for (var i = 0, len = array_length(arr); i < len; i++)
+				{
+					var _id = layer_get_id(arr[i]);
+					if _id != -1
+						instance_create_depth(0, 0, layer_get_depth(_id) - 1, obj_warshader).persistent = true;
+				}
 			}
 			
 			if !audio_is_playing(sr(lapsong))
