@@ -343,7 +343,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/gaintime.ogg", "sfx_gaintime.ogg");
 	
 	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", 69);
-	s = 1 / 60;
+	s = 0.016666666666666666;
 	tseconds = 0;
 	prev_tseconds = 0;
 	addseconds = 0;
@@ -508,9 +508,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				tseconds++;
 				addsecondstimer = 2;
 			}
+			
+			seconds = max(ceil(seconds), 0);
 		}
 		
-		if addseconds <= 0 && !instance_exists(obj_fadeout)
+		if addseconds <= 0 && !instance_exists(obj_fadeout) && obj_player1.state != 137
 		{
 			if tseconds <= 0 && candie
 			{
@@ -527,11 +529,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
 				}
 			}
+			
 			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
 				prev_tseconds = tseconds;
 			}
+			
 			tseconds = max(tseconds - s, 0);
 		}
 		
