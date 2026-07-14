@@ -6,6 +6,9 @@ with obj_drawcontroller
 	bricklap4y = 0;
 }
 
+global.slbr3 = false;
+global.slbr4 = false;
+
 global.lap4times =
 {
     entrance_10: 4,
@@ -267,10 +270,7 @@ global.lap4times =
 	dragonlair_9 : 4
 };
 
-global.visitedrooms = 
-{
-
-};
+global.visitedrooms = {};
 
 instance_destroy(obj_custom_object_ext);
 with (instance_create(0, 0, obj_custom_object_ext))
@@ -473,8 +473,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		{
 			offset = -200;
 			tseconds = 1;
+			
 			candie = false;
 			global.visitedrooms = {};
+			
+			global.slbr3 = false;
+			global.slbr4 = false;
+			
 			if !instance_exists(obj_wartimer)
 				instance_destroy(obj_warshader);
 			exit;
@@ -582,7 +587,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime")
+			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset >= 0
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
 				prev_tseconds = tseconds;
@@ -680,12 +685,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			var b = get_dark(image_blend, use_dark);
 			
-			if global.laps >= 2
+			if global.slbr3
 			{
 				bricklap3y = (bricklap3y + 4) mod sprite_get_height(other.sr("bg_fallingbricksforefront"));
 				draw_sprite_tiled_ext(other.sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
 				
-				if global.laps >= 3
+				if global.slbr4
 				{
 					bricklap4y = (bricklap4y + 4) mod sprite_get_height(other.sr("bg_pizzafacefallout"));
 					draw_sprite_tiled_ext(other.sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
@@ -778,9 +783,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			global.fill = 0;
 			lapsong = "mu_lap3_2";
 			
+			global.slbr3 = true;
+			
 			if global.laps >= 3
 			{
 				lapsong = "mu_lap4_v2";
+				global.slbr4 = true;
 				var arr = ["Backgrounds_1", "Backgrounds_Ground1", "Backgrounds_still1"];
 				for (var i = 0, len = array_length(arr); i < len; i++)
 				{
