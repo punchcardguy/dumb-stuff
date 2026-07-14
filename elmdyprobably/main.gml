@@ -735,7 +735,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		if global.laps >= 3 && global.lap4times[$ room_get_name(room)] != undefined && global.visitedrooms[$ room_get_name(room)] == undefined
 		{
-			scr_soundeffect(sr("sfx_gaintime"));
+			if offset >= 0
+				scr_soundeffect(sr("sfx_gaintime"));
 			addseconds = global.lap4times[$ room_get_name(room)];
 			array_push(postivenumbers,
 			{
