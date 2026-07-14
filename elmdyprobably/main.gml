@@ -390,7 +390,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 				else if d.type == 1
 					variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
-				else if d.type == 2 && asset_get_index(d.spritename) != -1
+				else if d.type == 2
 				{
 					var spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
 					global.bigfontTIMER = font_add_sprite_ext(spr, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
