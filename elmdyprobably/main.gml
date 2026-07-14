@@ -628,6 +628,26 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, 0, c_white, 1);
 		}
 		
+		with obj_drawcontroller
+		{
+			if room == timesuproom || room == rank_room || instance_exists(obj_ghostcollectibles)
+				exit;
+			
+			var b = get_dark(image_blend, use_dark);
+			
+			if global.laps >= 2
+			{
+				bricklap3y = (bricklap3y + 4) mod sprite_get_height(bg_fallingbricksforefront);
+				draw_sprite_tiled_ext(sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
+				
+				if global.laps >= 3
+				{
+					bricklap4y = (bricklap4y + 4) mod sprite_get_height(bg_pizzafacefallout);
+					draw_sprite_tiled_ext(sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
+				}
+			}
+		}
+		
 		if global.oldsprites || !instance_exists(obj_lapportal)
 			exit;
 		
@@ -658,26 +678,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 				else
 					draw_sprite(other.larpwarningspr, 0, x, y + Wave(-5, 5, 0.5, 5));
-			}
-		}
-		
-		with obj_drawcontroller
-		{
-			if room == timesuproom || room == rank_room || instance_exists(obj_ghostcollectibles)
-				exit;
-			
-			var b = get_dark(image_blend, use_dark);
-			
-			if global.laps >= 2
-			{
-				bricklap3y = (bricklap3y + 4) mod sprite_get_height(bg_fallingbricksforefront);
-				draw_sprite_tiled_ext(sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
-				
-				if global.laps >= 3
-				{
-					bricklap4y = (bricklap4y + 4) mod sprite_get_height(bg_pizzafacefallout);
-					draw_sprite_tiled_ext(sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
-				}
 			}
 		}
 	';
@@ -715,7 +715,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if global.laps >= 3
 			{
 				lapsong = "mu_lap4_v2";
-				instance_create(0, 0, obj_warshader);
+				instance_create(0, 0, obj_warshader).persistent = true;
 			}
 			
 			if !audio_is_playing(sr(lapsong))
