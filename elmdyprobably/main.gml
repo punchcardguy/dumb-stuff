@@ -637,13 +637,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			if global.laps >= 2
 			{
-				bricklap3y = (bricklap3y + 4) mod sprite_get_height(bg_fallingbricksforefront);
-				draw_sprite_tiled_ext(sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
+				bricklap3y = (bricklap3y + 4) mod sprite_get_height(other.sr("bg_fallingbricksforefront"));
+				draw_sprite_tiled_ext(other.sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
 				
 				if global.laps >= 3
 				{
-					bricklap4y = (bricklap4y + 4) mod sprite_get_height(bg_pizzafacefallout);
-					draw_sprite_tiled_ext(sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
+					bricklap4y = (bricklap4y + 4) mod sprite_get_height(other.sr("bg_pizzafacefallout"));
+					draw_sprite_tiled_ext(other.sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
 				}
 			}
 		}
