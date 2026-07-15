@@ -249,10 +249,10 @@ global.lap4times =
 	desert_11 : 3,
 	desert_10 : 4,
 	desert_9 : 4,
-	desert_8 : 6,
+	desert_8 : 7,
 	desert_7 : 3,
 	desert_6 : 3,
-	desert_5 : 6,
+	desert_5 : 8,
 	desert_4 : 4,
 	desert_3 : 4,
 	desert_2 : 4,
@@ -278,9 +278,8 @@ checkpoint = function(_x, _y) constructor
 	x = _x;
 	y = _y;
 	sprite_index = spr_checkpoint;
+	ind = 0;
 }
-
-global.checkpointind = 0;
 
 global.checkpoints = 
 {
@@ -360,6 +359,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4warning.png", "spr_lap4warning", 1, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4.png", "spr_lap4.png", 1, 123);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4checkpoint_activating.png", "spr_lap4checkpoint_activating.png", 6, 50, 100);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4checkpoint_activated.png", "spr_lap4checkpoint_activated.png", 8, 50, 100);
+	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungestart.png", "spr_snick_exe_lungestart.png", 3, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lunge.png", "spr_snick_exe_lunge.png", 4, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungeend.png", "spr_snick_exe_lungeend.png", 5, 50, 50);
@@ -421,7 +423,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				if d.type == 0
 				{
 					var _spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
-					sprite_set_speed(_spr, 60, 60);
+					sprite_set_speed(_spr, 1, spritespeed_framespergameframe);
 					variable_global_set(string_replace_all(d.name, ".png", ""), _spr);
 				}
 				else if d.type == 1
@@ -489,10 +491,17 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			instance_destroy(obj_sandparticle);
 		}
 		
-		if global.laps < 3 || room == rank_room || room == rm_levelselect || room == Realtitlescreen  // i cannot risk it
+		if global.laps < 2 || room == rank_room || room == rm_levelselect || room == Realtitlescreen  // i cannot risk it
 		{
 			global.lap3checkpoint = false;
 			global.lap4checkpoint = false;
+			
+			saveddata = {};
+			
+			// reset checkpoints sprite_index
+			
+			for (var i = 0, len = variable_struct_names_count(global.checkpoints), names = variable_struct_get_names(global.checkpoints); i < len; i++)
+				global.checkpoints[$ names[i]].sprite_index = spr_checkpoint;
 		}
 		
 		if global.laps < 3 || room == timesuproom || room == rank_room
@@ -726,11 +735,20 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
-		if global.checkpoints[$ room_get_name(room)] != undefined
+		if global.laps >= 2 && global.checkpoints[$ room_get_name(room)] != undefined
 		{
 			var c = global.checkpoints[$ room_get_name(room)];
-			global.checkpointind += 0.35; // wow this is dumb, but who cares
-			draw_sprite(c.sprite_index, global.checkpointind, c.x, c.y);
+			var image_number = sprite_get_number(c.sprite_index);
+			c.ind = (c.ind + 0.35) mod image_number; // glad i changed this from a global to a variable, yet this is still stupid
+			draw_sprite(c.sprite_index, c.ind, c.x, c.y);
+			
+			if floor(c.ind) == image_number - 1
+			{
+				if c.sprite_index == spr_checkpoint_activating
+					c.sprite_index = spr_checkpoint_activated;
+				else if c.sprite_index == sr("spr_lap4checkpoint_activating")
+					c.sprite_index = sr("spr_lap4checkpoint_activated");
+			}
 			
 			draw_set_font(-1);
 			
@@ -743,6 +761,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					global.lap3checkpoint = true;
 					if global.laps >= 3
 						global.lap4checkpoint = true;
+					
+					instance_create(0, 0, obj_transfotip).text = "/{u}Lap " + string((global.laps + 1)) + " Checkpoint Set!/"
 					
 					saveddata =
 					{
@@ -762,7 +782,17 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					}
 				}
 				
-				draw_text(c.x, c.y - 100, "bro got the checkpoint");
+				if c.sprite_index != spr_checkpoint_activating && c.sprite_index != spr_checkpoint_activated && global.laps <= 2
+				{
+					c.ind = 0;
+					c.sprite_index = spr_checkpoint_activating;
+				}
+				
+				if global.laps >= 3 && c.sprite_index != sr("spr_lap4checkpoint_activating") && c.sprite_index != sr("spr_lap4checkpoint_activated")
+				{
+					c.ind = 0;
+					c.sprite_index = sr("spr_lap4checkpoint_activating");
+				}
 			}
 		}
 		
