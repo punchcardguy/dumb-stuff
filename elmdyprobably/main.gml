@@ -270,13 +270,36 @@ global.lap4times =
 	dragonlair_9 : 4
 };
 
+global.lap3checkpoint = false;
+global.lap4checkpoint = false;
+
+checkpoint = function(_x, _y) constructor
+{
+	x = _x;
+	y = _y;
+	sprite_index = spr_checkpoint;
+}
+
+global.checkpointind = 0;
+
+global.checkpoints = 
+{
+	entrance_10 : new checkpoint(864, 480),
+	medieval_10 : new checkpoint(1088, 992),
+	ruin_11 : new checkpoint(1984, 1120),
+	dungeon_10 : new checkpoint(2016, 512),
+	
+	badland_10 : new checkpoint(1376, 800),
+	graveyard_6 : new checkpoint(1312, 1472)
+};
+
 global.visitedrooms = {};
 
 instance_destroy(obj_custom_object_ext);
 with (instance_create(0, 0, obj_custom_object_ext))
 {
 	persistent = true;
-	fuckmeforexisting = 5;
+	fuckmeforexisting = 5; // where does this get used
 	image_alpha = 0;
 	download_queue = ds_queue_create();
 	enum asset_type_dl
@@ -432,7 +455,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		with obj_lapportalentrance if sprite_index == spr_pizzaportal_disappear && image_index == 0 && !global.oldsprites 
 			scr_soundeffect(sfx_lapexit);
 		
-		if room == timesuproom && obj_player.state == 89 && obj_player.y > ((room_height * 2) - 30)
+		if room == timesuproom && obj_player.state == 89 && (global.lap3checkpoint || global.lap4checkpoint) && obj_player.y > ((room_height * 2) - 30)
 		{
 			obj_player.state = 146;
 			global.collect = saveddata.savedscore;
@@ -456,10 +479,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			instance_create(0, 0, obj_fadeout);
 			
-			obj_tv.sprite_index = saveddata.tv_sprite;
-			obj_tv.state = saveddata.tv_state;
-			obj_tv.expressionsprite = saveddata.tv_expressionsprite;
-			obj_tv.expressionbuffer = saveddata.tv_expressionbuffer;
+			obj_tv.state = 0;
 			
 			obj_player.cutscene = false;
 			obj_player.alarm[10] = -1;
@@ -467,6 +487,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			instance_destroy(obj_combotitle);
 			instance_destroy(obj_comboend);
 			instance_destroy(obj_sandparticle);
+		}
+		
+		if global.laps < 3 || room == rank_room || room == rm_levelselect || room == Realtitlescreen  // i cannot risk it
+		{
+			global.lap3checkpoint = false;
+			global.lap4checkpoint = false;
 		}
 		
 		if global.laps < 3 || room == timesuproom || room == rank_room
@@ -636,7 +662,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if global.laps < 3 || room == timesuproom || room == rank_room
 			exit;
 		
-		draw_set_font(global.bigfontTIMER);
+		draw_set_font(global.bigfont);
 		draw_set_alpha(1);
 		
 		draw_set_valign(fa_middle);
@@ -652,6 +678,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_set_color(_check ? c_red : c_white);
 		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
+		
+		draw_set_font(global.bigfontTIMER);
 		
 		for (var  len = array_length(postivenumbers), i = len - 1; i >= 0; i--)
 		{
@@ -695,6 +723,46 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					bricklap4y = (bricklap4y + 4) mod sprite_get_height(other.sr("bg_pizzafacefallout"));
 					draw_sprite_tiled_ext(other.sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
 				}
+			}
+		}
+		
+		if global.checkpoints[$ room_get_name(room)] != undefined
+		{
+			var c = global.checkpoints[$ room_get_name(room)];
+			global.checkpointind += 0.35; // wow this is dumb, but who cares
+			draw_sprite(c.sprite_index, global.checkpointind, c.x, c.y);
+			
+			draw_set_font(-1);
+			
+			// most of everything here should be in a step event but im too lazy, sorry
+			
+			if point_in_rectangle(obj_player1.x, obj_player1.y, c.x - sprite_get_xoffset(c.sprite_index), c.y - sprite_get_yoffset(c.sprite_index), c.x + (-sprite_get_xoffset(c.sprite_index) + sprite_get_width(c.sprite_index)), c.y + (-sprite_get_yoffset(c.sprite_index) + sprite_get_height(c.sprite_index)))
+			{
+				if !global.lap3checkpoint || (!global.lap4checkpoint && global.laps >= 3)
+				{
+					global.lap3checkpoint = true;
+					if global.laps >= 3
+						global.lap4checkpoint = true;
+					
+					saveddata =
+					{
+						savedscore : global.collect, 
+						savedcomboscore : global.comboscore,
+						savedcombo : global.combo, 
+						savedcombotime : global.combotime, 
+						savedlaps : global.laps, 
+						savedroom : room, 
+						savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
+					}
+					
+					for (var i = 0, len = array_length(shittosave); i < len; i++) 
+					{
+						ds_list_clear(oldsavedshit[i]);
+						ds_list_copy(oldsavedshit[i], shittosave[i]);
+					}
+				}
+				
+				draw_text(c.x, c.y - 100, "bro got the checkpoint");
 			}
 		}
 		
@@ -757,29 +825,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			break;
 		}
 		
+		if instance_exists(obj_lapportal) && global.laps >= 3
+			instance_destroy(obj_lapportal);
+		
 		if instance_exists(obj_lapportalentrance) && global.laps >= 2
 		{
-			saveddata =
-			{
-				savedscore : global.collect, 
-				savedcomboscore : global.comboscore,
-				savedcombo : global.combo, 
-				savedcombotime : global.combotime, 
-				savedlaps : global.laps, 
-				savedroom : room, 
-				savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
-				tv_expressionsprite : obj_tv.expressionsprite,
-				tv_expressionbuffer : obj_tv.expressionbuffer,
-				tv_state : obj_tv.state,
-				tv_sprite : obj_tv.sprite_index
-			}
-			
-			for (var i = 0, len = array_length(shittosave); i < len; i++) 
-			{
-				ds_list_clear(oldsavedshit[i]);
-				ds_list_copy(oldsavedshit[i], shittosave[i]);
-			} 
-
 			global.fill = 0;
 			lapsong = "mu_lap3_2";
 			
