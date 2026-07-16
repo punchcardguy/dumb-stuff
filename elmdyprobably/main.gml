@@ -402,6 +402,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_fallingbricksforefront.png", "bg_fallingbricksforefront.png");
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_pizzafacefallout.png", "bg_pizzafacefallout.png");
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_tv_peplap3.png", "spr_tv_peplap3.png", 19, 139, 134); // 19 frame, xoraneg : 139, yoran ge : 134
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_tv_pepworried.png", "spr_tv_pepworried.png", 19, 139, 134);
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
@@ -415,7 +418,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	addsecondstimer = 0;
 	offset = -200;
 	ind = 0;
-	postivenumbers = []; // flash : true, alpha : 1.5, color : #58C000 (116, display_get_gui_height() - 64 - offset)
+	postivenumbers = [];
 	req = noone;
 	larpwarningspr = spr_lap2warning;
 	lapsong = "mu_lap3_2";
@@ -484,12 +487,27 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			} 
 		}
 		
-		with obj_lap2visual
+		// spr_tv_peplap3
+		
+		instance_destroy(obj_tvtrigger);
+		obj_tv.prompt = noone;
+		ds_list_clear(obj_tv.tvprompts_list);
+		
+		if global.laps >= 2
 		{
-			if global.laps == 2
-				sprite_index = other.sr("spr_lap3");
-			else if global.laps >= 3
-				sprite_index = other.sr("spr_lap4");
+			with obj_lap2visual
+				sprite_index = global.laps >= 3 ? other.sr("spr_lap4") : other.sr("spr_lap3");
+			
+			if obj_tv.state == 0 || obj_tv.state == 251
+			{
+				if obj_player1.state != 121 && obj_player1.sprite_index != obj_player1.spr_mach3boost && !obj_player1.mach4mode
+					tv_do_expression(sr(global.laps >= 3 ? "spr_tv_pepworried" : "spr_tv_peplap3"));
+				else if obj_tv.sprite_index == sr("spr_tv_peplap3") || obj_tv.sprite_index == sr("spr_tv_pepworried")
+				{
+					obj_tv.state = 250;
+					obj_tv.expressionsprite = obj_player1.mach4mode ? obj_player1._spr_tv_exprmach4 : obj_player1._spr_tv_exprmach3;
+				}
+			}
 		}
 		
 		with obj_lapportal if sprite_index == spr_pizzaportalend && image_index == 0
@@ -733,7 +751,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			draw_set_halign(fa_left);
 			draw_set_valign(fa_middle);
 			
-			draw_text(10, 480, "GITHUB COMMIT NUMBER : " + github_last_commit_number + ", GITHUB COMMIT MESSAGE : " + github_commit_message)
+			draw_text(10, 460, "GITHUB COMMIT MESSAGE : " + github_commit_message)
+			draw_text(10, 480, "GITHUB COMMIT NUMBER : " + github_last_commit_number)
 			draw_text(10, 500, "ELMDY");
 		}
 		
@@ -782,26 +801,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		{
 			with snickexe
 				draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, 0, c_white, 1);
-		}
-		
-		with obj_drawcontroller
-		{
-			if room == timesuproom || room == rank_room || instance_exists(obj_ghostcollectibles)
-				exit;
-			
-			var b = get_dark(image_blend, use_dark);
-			
-			if global.slbr3
-			{
-				bricklap3y = (bricklap3y + 4) mod sprite_get_height(other.sr("bg_fallingbricksforefront"));
-				draw_sprite_tiled_ext(other.sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
-				
-				if global.slbr4
-				{
-					bricklap4y = (bricklap4y + 4) mod sprite_get_height(other.sr("bg_pizzafacefallout"));
-					draw_sprite_tiled_ext(other.sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
-				}
-			}
 		}
 		
 		if global.laps >= 2 && global.checkpoints[$ room_get_name(room)] != undefined
@@ -863,6 +862,26 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				{
 					c.ind = 0;
 					c.sprite_index = sr("spr_lap4checkpoint_activating");
+				}
+			}
+		}
+		
+		with obj_drawcontroller
+		{
+			if room == timesuproom || room == rank_room || instance_exists(obj_ghostcollectibles)
+				exit;
+			
+			var b = get_dark(image_blend, use_dark);
+			
+			if global.slbr3
+			{
+				bricklap3y = (bricklap3y + 4) mod sprite_get_height(other.sr("bg_fallingbricksforefront"));
+				draw_sprite_tiled_ext(other.sr("bg_fallingbricksforefront"), 0, 0, bricklap3y, 1, 1, b, 1);
+				
+				if global.slbr4
+				{
+					bricklap4y = (bricklap4y + 4) mod sprite_get_height(other.sr("bg_pizzafacefallout"));
+					draw_sprite_tiled_ext(other.sr("bg_pizzafacefallout"), 0, 0, bricklap4y, 1, 1, b, 0.7);
 				}
 			}
 		}
