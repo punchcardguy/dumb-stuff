@@ -295,7 +295,7 @@ global.checkpoints =
 	farm_11 : new checkpoint(3360, 1824),
 	saloon_6 : new checkpoint(704, 896),
 	
-	plage_cavern3 : new checkpoint(1888, 1376),
+	plage_cavern3 : new checkpoint(1888, 1376), // not anywhere near john
 	forest_john : new checkpoint(832, 608),
 	space_9 : new checkpoint(3328, 800),
 	minigolf_8 : new checkpoint(2752, 800),
@@ -303,7 +303,7 @@ global.checkpoints =
 	street_john : new checkpoint(576, 608),
 	industrial_5 : new checkpoint(3712, 2208),
 	sewer_8 : new checkpoint(1772, 1536),
-	freezer_13 : new checkpoint(672, 1728),
+	freezer_13 : new checkpoint(672, 1728), // not anywhere near john
 	
 	chateau_9 : new checkpoint(8320, 1184),
 	kidsparty_john : new checkpoint(2272, 576),
@@ -312,7 +312,7 @@ global.checkpoints =
 	// PTEM LEVEL'S
 	
 	strongcold_1 : new checkpoint(640, 448),
-	normalT_room6 : new checkpoint(576, 416),
+	normalT_room6 : new checkpoint(576, 416), // no john man
 	desert_16 : new checkpoint(1280, 576),
 	dragonlair_2 : new checkpoint(864, 416)
 };
@@ -323,6 +323,14 @@ instance_destroy(obj_custom_object_ext);
 with (instance_create(0, 0, obj_custom_object_ext))
 {
 	persistent = true;
+	
+	FIX =
+	{
+		normalT_room6 : normalT_treasure,
+		freezer_13 : freezer_escape1,
+		plage_cavern3 : plage_cavern2
+	}
+	
 	fuckmeforexisting = 5; // where does this get used
 	image_alpha = 0;
 	download_queue = ds_queue_create();
@@ -787,7 +795,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					if global.laps >= 3
 						global.lap4checkpoint = true;
 					
-					instance_create(0, 0, obj_transfotip).text = "/{u}Lap " + string((global.laps + 1)) + " Checkpoint Set!/"
+					instance_create(0, 0, obj_transfotip).text = "/{u}Lap " + string((global.laps + 1)) + " Checkpoint Set!/";
+					
+					var rm = FIX[$ room_get_name(room)] ?? room;
 					
 					saveddata =
 					{
@@ -796,7 +806,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 						savedcombo : global.combo, 
 						savedcombotime : global.combotime, 
 						savedlaps : global.laps, 
-						savedroom : room, 
+						savedroom : rm, 
 						savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
 					}
 					
