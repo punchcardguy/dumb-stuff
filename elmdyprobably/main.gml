@@ -439,6 +439,20 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	toppins = ["shroomfollow", "cheesefollow", "tomatofollow", "sausagefollow", "pineapplefollow"];
 	saveddata = {};
 	
+	var headers = ds_map_create();
+
+	ds_map_add(headers, "Accept", "application/vnd.github+json")
+	ds_map_add(headers, "X-GitHub-Api-Version", "2026-03-10");
+
+	gitreq = http_request("https://api.github.com/repos/randomguy1177/PTEM-gmls/commits?per_page=100", "GET", headers, "");
+
+	ds_map_destroy(headers);
+	
+	github_commit_message = "fetching";
+	github_last_commit_number = "fetching";
+	
+	depth = -1;
+	
 	event.step[0] = @'
 		ind += 0.35;
 		
@@ -667,6 +681,14 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		offset = Approach(offset, 0, 2);
 	;'
 	event.http[0] = @'
+		if async_load[? "id"] == gitreq && async_load[? "status"] == 0
+		{
+			var result = json_parse(async_load[? "result"]);
+			
+			github_commit_message = result[0].commit.message;
+			github_last_commit_number = string(array_length(result));
+		}
+		
 		if async_load[? "id"] == req
 		{
 			if async_load[? "status"] == 0
@@ -700,6 +722,20 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	';
 	event.draw_gui[0] = @'
 		sr = function(arg0) {if !variable_global_exists(arg0) return spr_player_idle; return variable_global_get(arg0);}
+		
+		draw_set_alpha(1);
+		draw_set_color(c_white);
+		
+		draw_set_font(global.smallfont2);
+		
+		if room == rm_levelselect && instance_exists(obj_mainmenu)
+		{
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_middle);
+			
+			draw_text(10, 480, "GITHUB COMMIT NUMBER : " + github_last_commit_number + ", GITHUB COMMIT MESSAGE : " + github_commit_message)
+			draw_text(10, 500, "ELMDY");
+		}
 		
 		if global.laps < 3 || room == timesuproom || room == rank_room
 			exit;
