@@ -283,13 +283,38 @@ checkpoint = function(_x, _y) constructor
 
 global.checkpoints = 
 {
+	// MAIN LEVEL'S
+	
 	entrance_10 : new checkpoint(864, 480),
 	medieval_10 : new checkpoint(1088, 992),
 	ruin_11 : new checkpoint(1984, 1120),
 	dungeon_10 : new checkpoint(2016, 512),
 	
 	badland_10 : new checkpoint(1376, 800),
-	graveyard_6 : new checkpoint(1312, 1472)
+	graveyard_6 : new checkpoint(1312, 1472),
+	farm_11 : new checkpoint(3360, 1824),
+	saloon_6 : new checkpoint(704, 896),
+	
+	plage_cavern3 : new checkpoint(1888, 1376),
+	forest_john : new checkpoint(832, 608),
+	space_9 : new checkpoint(3328, 800),
+	minigolf_8 : new checkpoint(2752, 800),
+	
+	street_john : new checkpoint(576, 608),
+	industrial_5 : new checkpoint(3712, 2208),
+	sewer_8 : new checkpoint(1772, 1536),
+	freezer_13 : new checkpoint(672, 1728),
+	
+	chateau_9 : new checkpoint(8320, 1184),
+	kidsparty_john : new checkpoint(2272, 576),
+	tower_finalhallway : new checkpoint(1696, 672), // if you're somehow able to larp ctop good on you
+	
+	// PTEM LEVEL'S
+	
+	strongcold_1 : new checkpoint(640, 448),
+	normalT_room6 : new checkpoint(576, 416),
+	desert_16 : new checkpoint(1280, 576),
+	dragonlair_2 : new checkpoint(864, 416)
 };
 
 global.visitedrooms = {};
@@ -572,7 +597,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					sprite_index = spr_snick_exe;
 			}
 
-			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42)
+			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))
 			{
 				instance_create(x, y, obj_genericpoofeffect);
 				x = room_width / 2;
