@@ -331,9 +331,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		plage_cavern3 : plage_cavern2
 	}
 	
-	fuckmeforexisting = 5; // where does this get used
 	image_alpha = 0;
 	download_queue = ds_queue_create();
+	
 	enum asset_type_dl
 	{
 		sprite,
@@ -341,6 +341,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		replace
 	}
 	downloading = false;
+	
 	downloadFile = function(_file, _filename, _frames = 1, xorigin = 0, yorigin = 0) // this could be a constructor but im reusing code so it doesn't matter
 	{
 		var q =
@@ -405,6 +406,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_tv_peplap3.png", "spr_tv_peplap3.png", 19, 139, 134); // 19 frame, xoraneg : 139, yoran ge : 134
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_tv_pepworried.png", "spr_tv_pepworried.png", 19, 139, 134);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_rankLAP3P.png", "spr_rankLAP3P.png", 49, 480, 270);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_rankLAP4P.png", "spr_rankLAP4P.png", 45, 480, 270);
+	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap3.png", "spr_laprank_lap3.png", 3, 34, 32);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap4.png", "spr_laprank_lap4.png", 3, 34, 32);
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
@@ -455,6 +462,23 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	github_last_commit_number = "fetching";
 	
 	depth = -1;
+	
+	rank_struct =
+	{
+		p : "prank",
+		s : "srank"
+	};
+	
+	rank_struct_brother = 
+	{
+		"Lap3normal" : [0, 0],
+		"Lap3srank" : [1, 0],
+		"Lap3prank" : [2, 0],
+		
+		"Lap4normal" : [0, 1],
+		"Lap4srank" : [1, 1],
+		"Lap4prank" : [2, 1]
+	};
 	
 	event.step[0] = @'
 		ind += 0.35;
@@ -554,6 +578,27 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			instance_destroy(obj_combotitle);
 			instance_destroy(obj_comboend);
 			instance_destroy(obj_sandparticle);
+		}
+		
+		if instance_exists(obj_rank) && global.laps >= 2
+		{
+			with obj_rank if self[$ "DIdlaprank"] == undefined
+			{
+				ini_open_from_string(obj_savesystem.ini_str);
+				
+				var _rank = "Lap" + string(clamp(global.laps + 1, 3, 4)) + (other.rank_struct[$ global.rank] ?? "normal");
+				savedrank = _rank;
+				
+				ini_write_string("Lap_ranks", global.leveltosave, _rank);
+				
+				obj_savesystem.ini_str = ini_close();
+				gamesave_async_save();
+				
+				rankind = 0;
+				if (_rank == "Lap3prank" || _rank == "Lap4prank") && global.showrank
+					visible = false;
+				DIdlaprank = true;
+			}
 		}
 		
 		if global.laps < 2 || room == rank_room || room == rm_levelselect || room == Realtitlescreen  // i cannot risk it
@@ -687,7 +732,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset >= 0
+			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset != -200
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
 				prev_tseconds = tseconds;
@@ -735,7 +780,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				ds_queue_dequeue(download_queue);
 				downloading = false;
 				req = -1;
-			} 
+			}
 		}
 	';
 	event.draw_gui[0] = @'
@@ -746,14 +791,61 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		draw_set_font(global.smallfont2);
 		
-		if room == rm_levelselect && instance_exists(obj_mainmenu)
+		if room == rm_levelselect
 		{
-			draw_set_halign(fa_left);
-			draw_set_valign(fa_middle);
+			if instance_exists(obj_mainmenu)
+			{
+				draw_set_halign(fa_left);
+				draw_set_valign(fa_middle);
+				
+				draw_text(10, 460, "GITHUB COMMIT MESSAGE : " + github_commit_message)
+				draw_text(10, 480, "GITHUB COMMIT NUMBER : " + github_last_commit_number)
+				draw_text(10, 500, "ELMDY");
+			}
+			else if instance_exists(obj_levelselect)
+			{
+				ini_open_from_string(obj_savesystem.ini_str);
+				
+				var _levelinfo = obj_levelselect.level_array[obj_levelselect.selected_world][obj_levelselect.selected_level];
+				
+				var rank = ini_read_string("Lap_ranks", _levelinfo[2], "NONE");
+				
+				if rank == "NONE"
+					draw_sprite_ext(sr("spr_laprank_lap3"), 0, 351 - sprite_get_width(spr_ranks_hud), 406, 1, 1, 0, c_black, 1); // 406
+				else
+				{
+					var _spr = rank_struct_brother[$ rank][1] == 0 ? sr("spr_laprank_lap3") : sr("spr_laprank_lap4");
+					var _ind = rank_struct_brother[$ rank][0];
+
+					draw_sprite_ext(_spr, _ind, 351 - sprite_get_width(spr_ranks_hud), 406, 1, 1, 0, c_white, 1);
+				}
+				
+				obj_savesystem.ini_str = ini_close();
+			}
+		}
+		
+		if instance_exists(obj_rank) && global.laps >= 2 && !obj_rank.visible && obj_rank[$ "savedrank"] != undefined
+		{
+			var penis = sprite_get_number(obj_rank.savedrank == "Lap3prank" ? sr("spr_rankLAP3P") : sr("spr_rankLAP4P"));
+			obj_rank.rankind += 0.35;
 			
-			draw_text(10, 460, "GITHUB COMMIT MESSAGE : " + github_commit_message)
-			draw_text(10, 480, "GITHUB COMMIT NUMBER : " + github_last_commit_number)
-			draw_text(10, 500, "ELMDY");
+			if floor(obj_rank.rankind) == penis - 1
+				obj_rank.rankind = penis - 1;
+			
+			if global.usepaletteshaders
+			{
+				shader_set(global.Pal_Shader);
+				
+				if (global.collect >= global.collectN)
+					pal_swap_set(obj_player1.spr_palette, obj_player1.paletteselect, 0);
+				if (global.collectN > global.collect)
+					pal_swap_set(obj_player2.spr_palette, obj_player2.paletteselect, 0);
+				
+				draw_sprite_ext(obj_rank.savedrank == "Lap3prank" ? sr("spr_rankLAP3P") : sr("spr_rankLAP4P"), obj_rank.rankind, obj_rank.x, obj_rank.y, obj_rank.image_xscale, obj_rank.image_yscale, obj_rank.image_angle, obj_rank.image_blend, obj_rank.image_alpha)
+				shader_reset();
+			}
+			else
+				draw_sprite_ext(obj_rank.savedrank == "Lap3prank" ? sr("spr_rankLAP3P") : sr("spr_rankLAP4P"), obj_rank.rankind, obj_rank.x, obj_rank.y, obj_rank.image_xscale, obj_rank.image_yscale, obj_rank.image_angle, obj_rank.image_blend, obj_rank.image_alpha);
 		}
 		
 		if global.laps < 3 || room == timesuproom || room == rank_room
