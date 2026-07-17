@@ -390,7 +390,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3warning.png", "spr_lap3warning.png", 1, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap3.png", "spr_lap3.png", 1, 123);
-	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4warning.png", "spr_lap4warning", 1, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4warning.png", "spr_lap4warning.png", 1, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4.png", "spr_lap4.png", 1, 123);
 	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lap4checkpoint_activating.png", "spr_lap4checkpoint_activating.png", 6, 50, 100);
@@ -399,6 +399,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungestart.png", "spr_snick_exe_lungestart.png", 3, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lunge.png", "spr_snick_exe_lunge.png", 4, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_lungeend.png", "spr_snick_exe_lungeend.png", 5, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_snick_exe_dead.png", "spr_snick_exe_dead.png", 1, 50, 50);
+	
 	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_fallingbricksforefront.png", "bg_fallingbricksforefront.png");
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/bg_pizzafacefallout.png", "bg_pizzafacefallout.png");
@@ -417,7 +419,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/gaintime.ogg", "sfx_gaintime.ogg");
 	
-	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font", 69);
+	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font.png", 69);
 	s = 0.016666666666666666;
 	tseconds = 0;
 	prev_tseconds = 0;
@@ -429,6 +431,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	req = noone;
 	larpwarningspr = spr_lap2warning;
 	lapsong = "mu_lap3_2";
+	
 	snickexe =
 	{
 		x : 0,
@@ -440,8 +443,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		image_xscale : 1,
 		image_yscale : 1,
 		image_speed : 0.35,
-		image_number : 0
+		image_number : 0,
+		fakedead : false
 	};
+	
 	candie = false;
 	
 	oldsavedshit = [ds_list_create(), ds_list_create(), ds_list_create()];
@@ -555,7 +560,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			global.combo = saveddata.savedcombo;
 			global.comboscore = saveddata.savedcomboscore;
 			global.combotime = saveddata.savedcombotime;
-			global.combodropped = savedata.savedcombodropped;
+			global.combodropped = saveddata.savedcombodropped;
 			
 			global.panic = true;
 			global.laps = saveddata.savedlaps;
@@ -637,8 +642,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		with snickexe
 		{
-			var _dir = point_direction(x, y, playerid.x, playerid.y);
+			if fakedead
+				break;
+			
 			var _spd = 5;
+			var _dir = point_direction(x, y, playerid.x, playerid.y);
 			var _dist = point_distance(x, y, playerid.x, playerid.y);
 			
 			image_index += image_speed;
@@ -694,15 +702,51 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				y = -100;
 			}
 			
-			/* if instance_exists(obj_parryhitbox)
+			var thank_you_stumped_logs = other.id;
+			
+			if instance_exists(obj_parryhitbox)
 			{
-				var check = point_in_rectangle(obj_parryhitbox.x, obj_parryhitbox.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale));
-				if check
-					obj_parryhitbox.event_user(0);
-			} */
+				if point_in_rectangle(obj_parryhitbox.x, obj_parryhitbox.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
+				{
+					with instance_create(x, y, obj_sausageman_dead)
+					{
+						sprite_index = thank_you_stumped_logs.sr("spr_snick_exe_dead");
+						hsp = 0;
+						vsp = -12;
+					}
+					
+					x = -100;
+					y = -100;
+					with obj_parryhitbox event_user(0);
+					fakedead = true;
+				}
+			}
 			
 			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
 				scr_hurtplayer(playerid);
+		}
+		
+		if snickexe.fakedead
+		{
+			var found = false;
+			
+			with obj_sausageman_dead
+			{
+				if sprite_index != other.sr("spr_snick_exe_dead")
+					continue;
+				
+				found = true;
+			}
+			
+			if !found
+			{
+				with snickexe
+				{
+					fakedead = false;
+					x = room_width / 2;
+					y = -100;
+				}
+			}
 		}
 		
 		if addseconds > 0
@@ -737,7 +781,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset <= -190
+			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset > -190
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
 				prev_tseconds = tseconds;
@@ -768,13 +812,16 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					if d.type == 0
 					{
 						var _spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
-						sprite_set_speed(_spr, 60, spritespeed_framespersecond);
+						sprite_set_speed(_spr, 1, spritespeed_framespergameframe);
 						variable_global_set(string_replace_all(d.name, ".png", ""), _spr);
 					}
 					else if d.type == 1
 						variable_global_set(string_replace_all(d.name, ".ogg", ""), audio_create_stream(d.name));
-					else if d.type == 2 && asset_get_index(d.spritename) != -1
-						sprite_replace(asset_get_index(d.spritename), d.name, d.frames, false, false, d.xo, d.yo);
+					else if d.type == 2
+					{
+						var spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
+						global.bigfontTIMER = font_add_sprite_ext(spr, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
+					}
 				}
 				ds_queue_dequeue(download_queue);
 				downloading = false;
