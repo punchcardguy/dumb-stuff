@@ -752,7 +752,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					sprite_index = spr_snick_exe;
 			}
 
-			if point_in_rectangle(playerid.x, playerid.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))
+			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))
 			{
 				instance_create(x, y, obj_genericpoofeffect);
 				x = room_width / 2;
@@ -763,7 +763,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			if instance_exists(obj_parryhitbox)
 			{
-				if point_in_rectangle(obj_parryhitbox.x, obj_parryhitbox.y, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
+				if rectangle_in_rectangle(obj_parryhitbox.bbox_left, obj_parryhitbox.bbox_top, obj_parryhitbox.bbox_right, obj_parryhitbox.bbox_bottom, x - sprite_get_xoffset(sprite_index) * image_xscale, y - sprite_get_yoffset(sprite_index) * image_yscale, x + (-sprite_get_xoffset(sprite_index) + sprite_get_width(sprite_index)) * image_xscale, y + (-sprite_get_yoffset(sprite_index) + sprite_get_height(sprite_index)) * image_yscale)
 				{
 					with instance_create(x, y, obj_sausageman_dead)
 					{
