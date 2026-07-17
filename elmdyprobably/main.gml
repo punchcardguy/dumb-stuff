@@ -549,12 +549,17 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if room == timesuproom && obj_player.state == 89 && (global.lap3checkpoint || global.lap4checkpoint) && obj_player.y > ((room_height * 2) - 30)
 		{
 			obj_player.state = 146;
+			
 			global.collect = saveddata.savedscore;
+			
 			global.combo = saveddata.savedcombo;
 			global.comboscore = saveddata.savedcomboscore;
 			global.combotime = saveddata.savedcombotime;
+			global.combodropped = savedata.savedcombodropped;
+			
 			global.panic = true;
 			global.laps = saveddata.savedlaps;
+			
 			obj_player.targetRoom = saveddata.savedroom;
 			obj_player.targetDoor = "LAP";
 			obj_player.isgustavo = false;
@@ -732,7 +737,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset != -200
+			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset <= -190
 			{
 				scr_soundeffect(variable_global_get("sfx_losetime"));
 				prev_tseconds = tseconds;
@@ -931,7 +936,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 						savedscore : global.collect, 
 						savedcomboscore : global.comboscore,
 						savedcombo : global.combo, 
-						savedcombotime : global.combotime, 
+						savedcombotime : global.combotime,
+						savedcombodropped : global.combodropped,
 						savedlaps : global.laps, 
 						savedroom : rm, 
 						savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
