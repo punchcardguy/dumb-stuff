@@ -792,7 +792,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom)
+			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && (!playerid.instakillmove && playerid.state != 42 || (playerid.state == 37 && playerid.sprite_index == playerid.spr_clingwall))
 				scr_hurtplayer(playerid);
 		}
 		
