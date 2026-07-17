@@ -414,10 +414,13 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap3.png", "spr_laprank_lap3.png", 3, 34, 32);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap4.png", "spr_laprank_lap4.png", 3, 34, 32);
 	
-	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
+	
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/losetime.ogg", "sfx_losetime.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/gaintime.ogg", "sfx_gaintime.ogg");
+	
+	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/S1_A3.ogg", "sfx_snickdie.ogg");
 	
 	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font.png", 69);
 	s = 0.016666666666666666;
@@ -444,7 +447,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		image_yscale : 1,
 		image_speed : 0.35,
 		image_number : 0,
-		fakedead : false
+		fakedead : false,
+		ded : false
 	};
 	
 	candie = false;
@@ -484,6 +488,27 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		"Lap4srank" : [1, 1],
 		"Lap4prank" : [2, 1]
 	};
+	
+	thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
+	thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
+	
+	if global[$ "didelmdyextramodfiyroomshit"] == undefined
+	{
+		room_instance_add(entrance_5, 2496, 384, obj_escapecollect);
+		room_instance_add(entrance_5, 2528, 384, obj_escapecollect);
+		room_instance_add(entrance_5, 2560, 384, obj_escapecollect);
+		
+		room_instance_add(dungeon_7, 160, 96, obj_escapecollect);
+		room_instance_add(dungeon_7, 160, 64, obj_escapecollect);
+		room_instance_add(dungeon_7, 160, 32, obj_escapecollect);
+		
+		room_instance_add(dungeon_6, 1280, 1600, obj_escapecollect);
+		room_instance_add(dungeon_6, 1248, 1600, obj_escapecollect);
+		room_instance_add(dungeon_6, 1216, 1600, obj_escapecollect);
+		room_instance_add(dungeon_6, 1184, 1600, obj_escapecollect);
+		
+		global.didelmdyextramodfiyroomshit = true;
+	}
 	
 	event.step[0] = @'
 		ind += 0.35;
@@ -611,6 +636,37 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
+		if room == rank_room && !snickexe.ded && global.laps >= 3
+		{
+			var _x = thingyx;
+			var _y = thingyy;
+
+			while (_x > (obj_screensizer.draw_width - 100))
+				_x -= 20;
+
+			while (_y > (obj_screensizer.draw_height - 100))
+				_y -= 20;
+
+			while (_x < 100)
+				_x += 20;
+
+			while (_y < 100)
+				_y += 20;
+			
+			with instance_create(_x, _y, obj_sausageman_dead)
+			{
+				sprite_index = other.sr("spr_snick_exe_dead");
+				hsp = 0;
+				vsp = -12;
+			}
+			
+			scr_soundeffect(sr("sfx_snickdie"));
+			snickexe.ded = true;
+		}
+		
+		if obj_player1.sprite_index == obj_player1.spr_keyget 
+			global.combotime += 0.15;
+		
 		if global.laps < 2 || room == rank_room || room == rm_levelselect || room == Realtitlescreen  // i cannot risk it
 		{
 			global.lap3checkpoint = false;
@@ -642,6 +698,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		with snickexe
 		{
+			ded = false;
 			if fakedead
 				break;
 			
@@ -718,6 +775,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					x = -100;
 					y = -100;
 					with obj_parryhitbox event_user(0);
+					scr_soundeffect(other.sr("sfx_snickdie"));
 					fakedead = true;
 				}
 			}
@@ -1065,6 +1123,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 	';
 	event.room_start[0] = @'
+		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
+		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
+		
 		with snickexe
 		{
 			x = room_width / 2;
