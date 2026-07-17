@@ -414,6 +414,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap3.png", "spr_laprank_lap3.png", 3, 34, 32);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_laprank_lap4.png", "spr_laprank_lap4.png", 3, 34, 32);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblockwoke.png", "spr_lapblockwoke.png", 20); // 20 frame
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblocksleep.png", "spr_lapblocksleep.png");
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	
@@ -423,6 +426,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/S1_A3.ogg", "sfx_snickdie.ogg");
 	
 	downloadFile_imsofuckinglazy("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_font.png", "spr_font.png", 69);
+	
 	s = 0.016666666666666666;
 	tseconds = 0;
 	prev_tseconds = 0;
@@ -537,6 +541,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					var spr = sprite_add(d.name, d.frames, false, false, d.xo, d.yo);
 					global.bigfontTIMER = font_add_sprite_ext(spr, "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ!¡¿?.1234567890:ÁÄÃÀÂÉÈÊËÍÌÎÏÓÖÕÔÚÙÛÜÇ+Ò,-", true, -4);
 				}
+				
 				ds_queue_dequeue(download_queue);
 			} 
 		}
@@ -778,7 +783,10 @@ with (instance_create(0, 0, obj_custom_object_ext))
 					
 					x = -100;
 					y = -100;
-					with obj_parryhitbox event_user(0);
+					
+					with obj_parryhitbox
+						event_user(0);
+					
 					scr_soundeffect(other.sr("sfx_snickdie"));
 					fakedead = true;
 				}
@@ -1127,6 +1135,54 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 	';
 	event.room_start[0] = @'
+		if room == ruin_12
+		{
+			for (var i = 0; i < 3; i++)
+			{
+				with instance_create(1024, 1440 + (i * 32), obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			if global.laps >= 2
+				instance_create(1024, 1440, obj_solid).image_yscale = 3;
+		}
+		else if room == farm_4
+		{
+			with instance_place(928, 224, obj_platform)
+			{
+				x = 992;
+				image_xscale = 9;	
+			}
+			
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			tilemap_set(map_id, 0, 29, 7);
+			tilemap_set(map_id, 0, 30, 7);
+			tilemap_set(map_id, 1, 31, 7);
+			
+			for (var i = 0; i < 2; i++)
+			{
+				with instance_create(928 + (i * 32), 224, obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			if global.laps < 2
+				instance_create(928, 224, obj_platform).image_xscale = 2;
+		}
+		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
 		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
 		
