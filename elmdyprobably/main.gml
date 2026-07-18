@@ -514,6 +514,20 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		global.didelmdyextramodfiyroomshit = true;
 	}
 	
+	eggplant_extra_time =
+	{
+		farm_12b : 5
+	};
+	
+	final_extra_time =
+	{
+		farm_12b : 2
+	};
+	
+	sprite = 0;
+	sprite_index = spr_wall;
+	mask_index = spr_wall;
+	
 	event.step[0] = @'
 		ind += 0.35;
 		
@@ -1182,6 +1196,83 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if global.laps < 2
 				instance_create(928, 224, obj_platform).image_xscale = 2;
 		}
+		else if room == farm_11
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			tilemap_set(map_id, 0, 104, 65);
+			tilemap_set(map_id, 0, 105, 65);
+			tilemap_set(map_id, 0, 106, 65);
+			
+			tilemap_set(map_id, 0, 104, 66);
+			tilemap_set(map_id, 0, 105, 66);
+			tilemap_set(map_id, 0, 106, 66);
+			
+			tilemap_set(map_id, 0, 104, 67);
+			tilemap_set(map_id, 0, 105, 67);
+			tilemap_set(map_id, 0, 106, 67);
+			
+			tilemap_set(map_id, 148, 104, 68);
+			tilemap_set(map_id, 148, 105, 68);
+			tilemap_set(map_id, 13, 106, 68);
+			
+			for (var i = 0; i < 3; i++)
+			{
+				for (var j = 0; j < 3; j++)
+				{
+					if i == 1 && (j == 1 || j == 2)
+						continue;
+					with instance_create(3328 + (i * 32), 2080 + (j * 32), obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+			}
+			
+			if global.laps >= 2
+				instance_destroy(instance_place(3328, 2080, obj_solid));
+		}
+		else if room == farm_12b
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			instance_destroy(instance_place(3136, 512, obj_spike), false);
+			instance_destroy(instance_place(3168, 512, obj_spike), false);
+			instance_destroy(instance_place(3200, 512, obj_spike), false);
+			
+			// 60, 61, 62
+			tilemap_set(map_id, 62, 130, 11);
+			tilemap_set(map_id, 61, 129, 11);
+			tilemap_set(map_id, 60, 128, 11);
+			
+			for (var i = 0; i < 2; i++)
+			{
+				for (var j = 0; j < 5; j++)
+				{
+					var z = 128, a = 12;
+					
+					tilemap_set(map_id, 0, z + i, a + j);
+					
+					with instance_create(4096 + (i * 32), 384 + (j * 32), obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+			}
+			
+			if global.laps >= 2
+				instance_place(4096, -32, obj_solid).image_yscale = 13;
+		}
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
 		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
@@ -1246,6 +1337,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			if offset >= 0
 				scr_soundeffect(sr("sfx_gaintime"));
 			addseconds = global.lap4times[$ room_get_name(room)];
+			
+			if !obj_player1.finalmoveset && eggplant_extra_time[$ room_get_name(room)] != undefined
+				addseconds += eggplant_extra_time[$ room_get_name(room)];
+			else if obj_player1.finalmoveset && final_extra_time[$ room_get_name(room)] != undefined
+				addseconds += final_extra_time[$ room_get_name(room)];
+			
 			array_push(postivenumbers,
 			{
 				x : 124,
