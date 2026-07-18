@@ -679,6 +679,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
+		if instance_exists(obj_pizzaface) && obj_player1.state == 119
+			obj_pizzaface.image_alpha = 0;
+		
 		if room == rank_room && !snickexe.ded && global.laps >= 3
 		{
 			var _x = thingyx;
