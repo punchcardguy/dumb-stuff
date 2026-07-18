@@ -775,7 +775,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			var bbox_right = x + (sprite_get_bbox_right(sprite_index) - sprite_get_xoffset(sprite_index)) * image_xscale;
 			var bbox_bottom = y + (sprite_get_bbox_bottom(sprite_index) - sprite_get_yoffset(sprite_index)) * image_yscale;
 
-			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))
+			if (rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))) || (instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
 			{
 				instance_create(x, y, obj_genericpoofeffect);
 				x = room_width / 2;
@@ -806,7 +806,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && !playerid.instakillmove && (playerid.state != 37 || playerid.sprite_index == playerid.spr_clingwall) && playerid.state != 42
+			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && !playerid.instakillmove && (playerid.state != 37 || playerid.sprite_index == playerid.spr_clingwall) && playerid.state != 42 && !(instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
 				scr_hurtplayer(playerid);
 		}
 		
@@ -1242,10 +1242,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			var lay_id = layer_get_id("Tiles_1");
 			var map_id = layer_tilemap_get_id(lay_id);
 			
-			instance_destroy(instance_place(3136, 512, obj_spike), false);
-			instance_destroy(instance_place(3168, 512, obj_spike), false);
-			instance_destroy(instance_place(3200, 512, obj_spike), false);
-			
 			// 60, 61, 62
 			tilemap_set(map_id, 62, 130, 11);
 			tilemap_set(map_id, 61, 129, 11);
@@ -1271,7 +1267,15 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 			
 			if global.laps >= 2
+			{
+				instance_destroy(instance_place(3136, 512, obj_spike), false);
+				instance_destroy(instance_place(3168, 512, obj_spike), false);
+				instance_destroy(instance_place(3200, 512, obj_spike), false);
+				
 				instance_place(4096, -32, obj_solid).image_yscale = 13;
+				
+				instance_create(4768, 530, obj_priest);
+			}
 		}
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
