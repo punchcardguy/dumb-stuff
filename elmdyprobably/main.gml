@@ -417,6 +417,11 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblockwoke.png", "spr_lapblockwoke.png", 20); // 20 frame
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblocksleep.png", "spr_lapblocksleep.png");
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_pizzaface_retrodeath.png", "spr_pizzface_retrodeath.png", 1, 100, 100);
+	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesepriest.png", "spr_cheesepriest.png", 3, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesepriest_pray.png", "spr_cheesepriest_pray.png", 9, 50, 50);
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	
@@ -467,7 +472,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	ds_map_add(headers, "Accept", "application/vnd.github+json")
 	ds_map_add(headers, "X-GitHub-Api-Version", "2026-03-10");
 
-	gitreq = http_request("https://api.github.com/repos/randomguy1177/PTEM-gmls/commits?per_page=100", "GET", headers, "");
+	gitreq = http_request("https://api.github.com/repos/randomguy1177/PTEM-gmls/commits?path=elmdyprobably/main.gml&per_page=150", "GET", headers, "");
 
 	ds_map_destroy(headers);
 	
@@ -582,6 +587,25 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 		}
+		
+		if room == farm_12b
+		{
+			with obj_priest
+			{
+				switch sprite_index
+				{
+					case spr_priest_pray:
+						sprite_index = other.sr("spr_cheesepriest_pray");
+					break;
+					case spr_priest_idle:
+						sprite_index = other.sr("spr_cheesepriest");
+					break;
+				}
+			}
+		}
+		
+		with obj_shakeanddie if sprite_index == spr_pizzaface && global.oldsprites
+			sprite_index = other.sr("spr_pizzface_retrodeath");
 		
 		with obj_lapportal if sprite_index == spr_pizzaportalend && image_index == 0
 		{
@@ -833,48 +857,56 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
-		if addseconds > 0
+		if !instance_exists(obj_ghostcollectibles)
 		{
-			if addsecondstimer > 0
-				addsecondstimer--;
-			else
+			if addseconds > 0
 			{
-				addseconds--;
-				tseconds++;
-				addsecondstimer = 2;
-			}
-			
-			tseconds = max(ceil(tseconds), 0);
-		}
-		
-		if addseconds <= 0 && !instance_exists(obj_fadeout) && obj_player1.state != 137
-		{
-			if tseconds <= 0 && candie
-			{
-				with obj_player1
+				if addsecondstimer > 0
+					addsecondstimer--;
+				else
 				{
-					instance_destroy(obj_pizzaface);
-					instance_destroy(obj_fadeout);
-					targetDoor = "A";
-					room = timesuproom;
-					state = 64;
-					sprite_index = spr_Timesup;
-					image_index = 0;
-					audio_stop_all();
-					scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
+					addseconds--;
+					tseconds++;
+					addsecondstimer = 2;
 				}
+				
+				tseconds = max(ceil(tseconds), 0);
 			}
 			
-			if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset > -190
+			if addseconds <= 0 && !instance_exists(obj_fadeout) && obj_player1.state != 137
 			{
-				scr_soundeffect(variable_global_get("sfx_losetime"));
-				prev_tseconds = tseconds;
+				if tseconds <= 0 && candie
+				{
+					with obj_player1
+					{
+						instance_destroy(obj_pizzaface);
+						instance_destroy(obj_fadeout);
+						targetDoor = "A";
+						room = timesuproom;
+						state = 64;
+						sprite_index = spr_Timesup;
+						image_index = 0;
+						audio_stop_all();
+						scr_soundeffect(global.oldsprites ? mu_timesup : mu_Your_Fat_Ass_Slows_You_Down);
+						
+						scale_xs = 1;
+						scale_ys = 1;
+					}
+				}
+				
+				if floor(prev_tseconds) != floor(tseconds) && variable_global_exists("sfx_losetime") && offset > -190
+				{
+					scr_soundeffect(variable_global_get("sfx_losetime"));
+					prev_tseconds = tseconds;
+				}
+				
+				tseconds = max(tseconds - s, 0);
 			}
 			
-			tseconds = max(tseconds - s, 0);
+			offset = Approach(offset, 0, 2);
 		}
-		
-		offset = Approach(offset, 0, 2);
+		else
+			offset = Approach(offset, -200, 2);
 	;'
 	event.http[0] = @'
 		if async_load[? "id"] == gitreq && async_load[? "status"] == 0
@@ -1004,7 +1036,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		draw_text(87 + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), display_get_gui_height() - 100 - offset + (_check ? irandom_range((4 - _seconds) * - 1, (4 - _seconds)) : 0), string(_minutes) + ":" + ((_seconds < 10 ? "0" : "") + string(_seconds)));
 		draw_sprite_ext(_check ? sr("spr_mrskelly_timelow") : sr("spr_mrskelly_idle"), ind, 0, display_get_gui_height() - offset, 1, 1, 0, c_white, 1);
 		
-		draw_set_font(global.bigfontTIMER);
+		draw_set_font(variable_global_exists("bigfontTIMER") ? global.bigfontTIMER : global.bigfont);
 		
 		for (var  len = array_length(postivenumbers), i = len - 1; i >= 0; i--)
 		{
@@ -1149,6 +1181,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 	';
 	event.room_start[0] = @'
+		// NERFS
 		if room == ruin_12
 		{
 			for (var i = 0; i < 3; i++)
@@ -1275,6 +1308,85 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				instance_place(4096, -32, obj_solid).image_yscale = 13;
 				
 				instance_create(4768, 530, obj_priest);
+			}
+		}
+		else if room == street_john
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			for (var i = 0; i < 6; i++)
+			{
+				instance_destroy(instance_place(544 + (i * 32), 480, obj_spike), false);
+				
+				for (var j = 0; j < 2; j++)
+				{
+					var z = 17, a = 16;
+					
+					tilemap_set(map_id, 0, z + i, a + j);
+				}
+			}
+			
+			for (var i = 0; i < 2; i++)
+			{
+				for (var j = 0; j < 2; j++)
+				{
+					with instance_place(672 + (i * 32), 416 + (j * 32), obj_collect)
+						y += 128;
+				}
+			}
+			
+			instance_destroy(instance_place(544, 512, obj_solid));
+		}
+		else if room == street_4
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			tilemap_set(map_id, 108, 162, 29);
+			tilemap_set(map_id, 88, 162, 28);
+			tilemap_set(map_id, 68, 162, 27);
+			tilemap_set(map_id, 29, 162, 26);
+			
+			tilemap_set(map_id, 104, 163, 26);
+			tilemap_set(map_id, 104, 164, 26);
+			tilemap_set(map_id, 108, 165, 26);
+			
+			tilemap_set(map_id, 64, 162, 25);
+			tilemap_set(map_id, 64, 163, 25);
+			
+			for (var i = 0; i < 3; i++)
+			{
+				for (var j = 0; j < 3; j++)
+				{
+					tilemap_set(map_id, 0, 163 + i, 27 + j);
+					
+					if (i == 0 || i == 1) && (j == 0 || j == 1)
+						continue;
+					
+					with instance_create(5216 + (i * 32), 864 + (j * 32), obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+			}
+			
+			if global.laps >= 2
+			{
+				with instance_place(5120, 672, obj_solid)
+					image_xscale = 3;
+				
+				with instance_create(5216, 672, obj_solid)
+				{
+					image_xscale = 3;
+					image_yscale = 6;
+				}
+				
+				instance_create(3712, 1088, obj_grabbiehand);
 			}
 		}
 		
