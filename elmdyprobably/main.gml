@@ -425,6 +425,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesepriest.png", "spr_cheesepriest.png", 3, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesepriest_pray.png", "spr_cheesepriest_pray.png", 9, 50, 50);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesehand.png", "spr_cheesehand.png", 8, 50, 50);
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesehand_grab.png", "spr_cheesehand_grab.png", 5, 50, 50);
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	
@@ -606,6 +609,21 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 		}
+		else if room == street_4
+		{
+			with obj_grabbiehand
+			{
+				switch sprite_index
+				{
+					case spr_grabbiehand_catch:
+						sprite_index = other.sr("spr_cheesehand_grab");
+					break;
+					case spr_grabbiehand_idle:
+						sprite_index = other.sr("spr_cheesehand");
+					break;
+				}
+			}
+		}
 		
 		with obj_shakeanddie if sprite_index == spr_pizzaface && global.oldsprites
 			sprite_index = other.sr("spr_pizzface_retrodeath");
@@ -636,9 +654,12 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			global.panic = true;
 			global.laps = saveddata.savedlaps;
 			
-			obj_player.targetRoom = saveddata.savedroom;
-			obj_player.targetDoor = "LAP";
-			obj_player.isgustavo = false;
+			obj_player1.targetRoom = saveddata.savedroom;
+			obj_player1.targetDoor = "LAP";
+			obj_player1.isgustavo = false;
+			
+			obj_player1.supercharge = saveddata.savedcharge;
+			obj_player1.supercharged = saveddata.savedcharged;
 			
 			for (var k = 0, len = array_length(saveddata.savedtoppins); k < len; k++)
 				variable_global_set(toppins[k], saveddata.savedtoppins[k]);
@@ -709,6 +730,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				sprite_index = other.sr("spr_snick_exe_dead");
 				hsp = 0;
 				vsp = -12;
+				image_xscale = 1;
 			}
 			
 			scr_soundeffect(sr("sfx_snickdie"));
@@ -750,6 +772,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		with snickexe
 		{
 			ded = false;
+			
 			if fakedead
 				break;
 			
@@ -807,7 +830,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			var bbox_right = x + (sprite_get_bbox_right(sprite_index) - sprite_get_xoffset(sprite_index)) * image_xscale;
 			var bbox_bottom = y + (sprite_get_bbox_bottom(sprite_index) - sprite_get_yoffset(sprite_index)) * image_yscale;
 
-			if (rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))) || (instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
+			if (rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && (playerid.instakillmove || playerid.state == 42 || (playerid.state == 37 && playerid.sprite_index != playerid.spr_clingwall))) || (instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom)) || (instance_exists(obj_shotgunbullet) && rectangle_in_rectangle(obj_shotgunbullet.bbox_left, obj_shotgunbullet.bbox_top, obj_shotgunbullet.bbox_right, obj_shotgunbullet.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
 			{
 				instance_create(x, y, obj_genericpoofeffect);
 				x = room_width / 2;
@@ -825,6 +848,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 						sprite_index = thank_you_stumped_logs.sr("spr_snick_exe_dead");
 						hsp = 0;
 						vsp = -12;
+						image_xscale = 1;
 					}
 					
 					x = -100;
@@ -1112,6 +1136,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 						savedlaps : global.laps, 
 						savedroom : rm, 
 						savedtoppins : [global.shroomfollow, global.cheesefollow, global.tomatofollow, global.sausagefollow, global.pineapplefollow],
+						savedcharge : obj_player1.supercharge,
+						savedcharged : obj_player1.supercharged
 					}
 					
 					for (var i = 0, len = array_length(shittosave); i < len; i++) 
