@@ -417,6 +417,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblockwoke.png", "spr_lapblockwoke.png", 20); // 20 frame
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapblocksleep.png", "spr_lapblocksleep.png");
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapplatform_sleep.png", "spr_lapplatform_sleep.png");
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_lapplatform_woke.png", "spr_lapplatform_woke.png", 20);
+	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_pizzaface_retrodeath.png", "spr_pizzface_retrodeath.png", 1, 100, 100);
 	
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesepriest.png", "spr_cheesepriest.png", 3, 50, 50);
@@ -679,6 +682,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
+		obj_player1.spr_catched = obj_player1.isgustavo ? (obj_player1.brick ? spr_player_ratmounthurt : spr_lonegustavo_hurt) : spr_player_catched; // its always spr_player_catched regardless of character
+		
 		if instance_exists(obj_pizzaface) && obj_player1.state == 119
 			obj_pizzaface.image_alpha = 0;
 		
@@ -833,7 +838,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				}
 			}
 			
-			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && !playerid.instakillmove && (playerid.state != 37 || playerid.sprite_index == playerid.spr_clingwall) && playerid.state != 42 && !(instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
+			if rectangle_in_rectangle(playerid.bbox_left, playerid.bbox_top, playerid.bbox_right, playerid.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom) && !playerid.instakillmove && (playerid.state != 37 || playerid.sprite_index == playerid.spr_clingwall) && playerid.state != 119 && playerid.state != 42 && !(instance_exists(obj_morthitbox) && rectangle_in_rectangle(obj_morthitbox.bbox_left, obj_morthitbox.bbox_top, obj_morthitbox.bbox_right, obj_morthitbox.bbox_bottom, bbox_left, bbox_top, bbox_right, bbox_bottom))
 				scr_hurtplayer(playerid);
 		}
 		
@@ -1222,7 +1227,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				with instance_create(928 + (i * 32), 224, obj_custom_object)
 				{
 					sprite = 0;
-					sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
 					
 					image_speed = 0.35;
 					depth = 4;
@@ -1392,6 +1397,88 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				instance_create(3712, 1088, obj_grabbiehand);
 			}
 		}
+		else if room == plage_cavern3
+		{
+			for (var i = 0; i < 7; i++)
+			{
+				with instance_create(2016 + (i * 32), 1376, obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			for (var i = 0; i < 2; i++)
+			{
+				with instance_create(2208, 1408 + (i * 32), obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			if global.laps >= 2
+			{
+				instance_create(2016, 1376, obj_solid).image_xscale = 7;
+				instance_create(2208, 1408, obj_solid).image_yscale = 2;
+			}
+		}
+		else if room == graveyard_7
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			tilemap_set(map_id, 3, 30, 17);
+			tilemap_set(map_id, 3, 30, 23);
+			
+			instance_place(576, 544, obj_platform).image_xscale = 13;
+			instance_place(576, 736, obj_platform).image_xscale = 13;
+			
+			for (var i = 0; i < 3; i++)
+			{
+				var z = 31, a = 17;
+				
+				tilemap_set(map_id, 0, z + i, a);
+				
+				with instance_create(992 + (i * 32), 544, obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			for (var i = 0; i < 3; i++)
+			{
+				var z = 31, a = 23;
+				
+				tilemap_set(map_id, 0, z + i, a);
+				
+				with instance_create(992 + (i * 32), 736, obj_custom_object)
+				{
+					sprite = 0;
+					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
+					
+					image_speed = 0.35;
+					depth = 4;
+				}
+			}
+			
+			if global.laps < 2
+			{
+				instance_create(992, 544, obj_platform).image_xscale = 3;
+				instance_create(992, 736, obj_platform).image_xscale = 3;
+			}
+		}
+			
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
 		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
