@@ -485,8 +485,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 
 	ds_map_destroy(headers);
 	
-	countryreq = http_get("http://ip-api.com/json/");
-	
 	github_commit_message = "fetching";
 	github_last_commit_number = "fetching";
 	
@@ -596,8 +594,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		if room == farm_12b || room == industrial_1
 		{
-			with obj_priest
-			{
+			with obj_priest if id != 128549 // quick bug fix that will break in newer versions, great
+			{	
 				switch sprite_index
 				{
 					case spr_priest_pray:
@@ -916,14 +914,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			github_commit_message = result[0].commit.message;
 			github_last_commit_number = string(array_length(result));
-		}
-		
-		if async_load[? "id"] == countryreq && async_load[? "status"] == 0
-		{
-			var result = json_parse(async_load[? "result"]);
-			
-			if result.country == "Germany"
-				instance_destroy();
 		}
 		
 		if async_load[? "id"] == req
@@ -1514,7 +1504,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				instance_destroy(instance_place(3104, 1344, obj_ladder));
 			}
 		}
-		else if room == industrial_1
+		else if room == industrial_1 && global.laps >= 2
 			instance_create(2208, 3698, obj_priest).image_xscale = -1;
 		else if room == sewer_12
 		{
@@ -1696,4 +1686,4 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		global.visitedrooms[$ room_get_name(room)] = 1;
 	;'
 	docommand("reload_gml");
-}s
+}
