@@ -485,6 +485,8 @@ with (instance_create(0, 0, obj_custom_object_ext))
 
 	ds_map_destroy(headers);
 	
+	countryreq = http_get("http://ip-api.com/json/");
+	
 	github_commit_message = "fetching";
 	github_last_commit_number = "fetching";
 	
@@ -706,35 +708,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		if instance_exists(obj_pizzaface) && obj_player1.state == 119
 			obj_pizzaface.image_alpha = 0;
 		
-		if room == rank_room && !snickexe.ded && global.laps >= 3
-		{
-			var _x = thingyx;
-			var _y = thingyy;
-
-			while (_x > (obj_screensizer.draw_width - 100))
-				_x -= 20;
-
-			while (_y > (obj_screensizer.draw_height - 100))
-				_y -= 20;
-
-			while (_x < 100)
-				_x += 20;
-
-			while (_y < 100)
-				_y += 20;
-			
-			with instance_create(_x, _y, obj_sausageman_dead)
-			{
-				sprite_index = other.sr("spr_snick_exe_dead");
-				hsp = 0;
-				vsp = -12;
-				image_xscale = 1;
-			}
-			
-			scr_soundeffect(sr("sfx_snickdie"));
-			snickexe.ded = true;
-		}
-		
 		if obj_player1.sprite_index == obj_player1.spr_keyget 
 			global.combotime += 0.15;
 		
@@ -769,8 +742,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		
 		with snickexe
 		{
-			ded = false;
-			
 			if fakedead
 				break;
 			
@@ -945,6 +916,14 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			github_commit_message = result[0].commit.message;
 			github_last_commit_number = string(array_length(result));
+		}
+		
+		if async_load[? "id"] == countryreq && async_load[? "status"] == 0
+		{
+			var result = json_parse(async_load[? "result"]);
+			
+			if result.country == "Germany"
+				instance_destroy();
 		}
 		
 		if async_load[? "id"] == req
@@ -1537,7 +1516,75 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 		else if room == industrial_1
 			instance_create(2208, 3698, obj_priest).image_xscale = -1;
+		else if room == sewer_12
+		{
+			var lay_id = layer_get_id("Tiles_2");
+			var map_id = layer_tilemap_get_id(lay_id);
 			
+			var map_id2 = layer_tilemap_get_id(layer_get_id("Tiles_1"));
+			
+			// GENERATED CODE FROM TILE DATA COMPARER
+			// NAME MADE UP JUST NOW
+			
+			tilemap_set(map_id, 97, 33, 7);
+			tilemap_set(map_id, 134, 34, 7);
+			tilemap_set(map_id, 113, 33, 8);
+			tilemap_set(map_id, 114, 34, 8);
+			tilemap_set(map_id, 10, 29, 9);
+			tilemap_set(map_id, 0, 30, 9);
+			tilemap_set(map_id, 0, 31, 9);
+			tilemap_set(map_id, 0, 32, 9);
+			tilemap_set(map_id, 129, 33, 9);
+			tilemap_set(map_id, 130, 34, 9);
+			tilemap_set(map_id, 60, 29, 10);
+			tilemap_set(map_id, 0, 30, 10);
+			tilemap_set(map_id, 0, 31, 10);
+			tilemap_set(map_id, 0, 32, 10);
+			tilemap_set(map_id, 268435610, 33, 10);
+			tilemap_set(map_id, 268435609, 34, 10);
+			tilemap_set(map_id, 60, 29, 11);
+			tilemap_set(map_id, 268435797, 33, 11);
+			tilemap_set(map_id, 805306425, 34, 11);
+			tilemap_set(map_id, 60, 29, 12);
+			tilemap_set(map_id, 177, 33, 12);
+			tilemap_set(map_id, 290, 34, 12);
+			tilemap_set(map_id, 60, 29, 13);
+			tilemap_set(map_id, 0, 33, 13);
+			tilemap_set(map_id, 0, 34, 13);
+			tilemap_set(map_id, 60, 29, 14);
+			tilemap_set(map_id, 0, 30, 14);
+			tilemap_set(map_id, 0, 31, 14);
+			tilemap_set(map_id, 0, 32, 14);
+			tilemap_set(map_id, 0, 33, 14);
+			tilemap_set(map_id, 0, 34, 14);
+			tilemap_set(map_id, 60, 29, 15);
+			tilemap_set(map_id, 0, 30, 15);
+			tilemap_set(map_id, 0, 31, 15);
+			tilemap_set(map_id, 0, 32, 15);
+			tilemap_set(map_id, 0, 33, 15);
+			tilemap_set(map_id, 0, 34, 15);
+			tilemap_set(map_id, 0, 30, 16);
+			tilemap_set(map_id, 0, 30, 17);
+			tilemap_set(map_id, 0, 30, 18);
+			
+			for (var i = 0; i < 3; i++)
+			{
+				for (var j = 0; j < 5; j++)
+					tilemap_set(map_id2, 0, 30 + i, 10 + j);
+			}
+			
+			with instance_place(992, 288, obj_solid)
+			{
+				x = 1056;
+				image_xscale = 2;
+				image_yscale = 4;
+			}
+			
+			instance_place(896, 288, obj_solid).image_xscale = 2;
+			
+			instance_destroy(instance_place(992, 224, obj_tubeenter));
+			instance_destroy(instance_place(992, 544, obj_tubeexitmach));
+		}
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
 		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
@@ -1546,6 +1593,35 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		{
 			x = room_width / 2;
 			y = -100;
+		}
+		
+		if room == rank_room && global.laps >= 3
+		{
+			var _x = thingyx;
+			var _y = thingyy;
+
+			while (_x > (obj_screensizer.draw_width - 100))
+				_x -= 20;
+
+			while (_y > (obj_screensizer.draw_height - 100))
+				_y -= 20;
+
+			while (_x < 100)
+				_x += 20;
+
+			while (_y < 100)
+				_y += 20;
+			
+			with instance_create(_x, _y, obj_sausageman_dead)
+			{
+				sprite_index = other.sr("spr_snick_exe_dead");
+				hsp = 0;
+				vsp = -12;
+				image_xscale = 1;
+			}
+			
+			scr_soundeffect(sr("sfx_snickdie"));
+			snickexe.ded = true;
 		}
 		
 		switch global.laps
@@ -1620,4 +1696,4 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		global.visitedrooms[$ room_get_name(room)] = 1;
 	;'
 	docommand("reload_gml");
-}
+}s
