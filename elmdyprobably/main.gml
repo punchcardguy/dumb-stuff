@@ -80,7 +80,7 @@ global.lap4times =
 
     farm_11: 3,
     farm_12: 7,
-    farm_12b: 7,
+    farm_12b: 9,
     farm_13: 14,
     farm_4: 4,
     farm_1: 3,
@@ -428,6 +428,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesehand.png", "spr_cheesehand.png", 8, 50, 50);
 	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_cheesehand_grab.png", "spr_cheesehand_grab.png", 5, 50, 50);
 	
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_broken_platform.png", "spr_broken_platform.png");
+	downloadFile("https://raw.githubusercontent.com/randomguy1177/PTEM-gmls/refs/heads/main/elmdyprobably/spr_broken_platform_left.png", "spr_broken_platform_left.png");
+	
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap3_2.ogg", "mu_lap3_2.ogg");
 	downloadFileSound("https://github.com/randomguy1177/PTEM-gmls/raw/refs/heads/main/elmdyprobably/lap%204%20v2.ogg", "mu_lap4_v2.ogg");
 	
@@ -527,12 +530,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	
 	eggplant_extra_time =
 	{
-		farm_12b : 5
-	};
-	
-	final_extra_time =
-	{
-		farm_12b : 2
+		farm_12b : 3
 	};
 	
 	sprite = 0;
@@ -594,7 +592,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			}
 		}
 		
-		if room == farm_12b
+		if room == farm_12b || room == industrial_1
 		{
 			with obj_priest
 			{
@@ -1504,6 +1502,41 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				instance_create(992, 736, obj_platform).image_xscale = 3;
 			}
 		}
+		else if room == industrial_2
+		{
+			var lay_id = layer_get_id("Tiles_1");
+			var map_id = layer_tilemap_get_id(lay_id);
+			
+			if global.laps >= 2
+			{
+				for (var i = 0; i < 7; i++)
+					tilemap_set(map_id, 0, 110 + i, 24);
+				
+				for (var i = 0; i < 4; i++)
+				{
+					tilemap_set(map_id, 0, 105 + i, 33);
+					tilemap_set(map_id, 0, 97 + i, 42);
+				}
+				
+				instance_destroy(instance_place(3520, 768, obj_platform));
+				instance_destroy(instance_place(3360, 1056, obj_platform));
+				instance_destroy(instance_place(3104, 1344, obj_platform));
+				
+				instance_create(3520, 768, obj_sprite).sprite = sr("spr_broken_platform");
+				instance_create(3360, 1056, obj_sprite).sprite = sr("spr_broken_platform");
+				instance_create(3104, 1344, obj_sprite).sprite = sr("spr_broken_platform");
+				
+				instance_create(3712, 768, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+				instance_create(3456, 1056, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+				instance_create(3200, 1344, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+				
+				instance_destroy(instance_place(3712, 768, obj_ladder));
+				instance_destroy(instance_place(3392, 1056, obj_ladder));
+				instance_destroy(instance_place(3104, 1344, obj_ladder));
+			}
+		}
+		else if room == industrial_1
+			instance_create(2208, 3698, obj_priest).image_xscale = -1;
 			
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
@@ -1572,8 +1605,6 @@ with (instance_create(0, 0, obj_custom_object_ext))
 			
 			if !obj_player1.finalmoveset && eggplant_extra_time[$ room_get_name(room)] != undefined
 				addseconds += eggplant_extra_time[$ room_get_name(room)];
-			else if obj_player1.finalmoveset && final_extra_time[$ room_get_name(room)] != undefined
-				addseconds += final_extra_time[$ room_get_name(room)];
 			
 			array_push(postivenumbers,
 			{
