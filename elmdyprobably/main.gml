@@ -1639,7 +1639,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 				
 				instance_create(800, 576, obj_platform).image_xscale = 5;
 				
-				if global.laps <= 2
+				if global.laps < 2
 					instance_create(800, 672, obj_solid).image_xscale = 5;
 			break;
 			
