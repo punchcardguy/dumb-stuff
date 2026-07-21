@@ -906,7 +906,7 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		}
 		else
 			offset = Approach(offset, -200, 2);
-	;'
+	';
 	event.http[0] = @'
 		if async_load[? "id"] == gitreq && async_load[? "status"] == 0
 		{
@@ -1183,397 +1183,511 @@ with (instance_create(0, 0, obj_custom_object_ext))
 	';
 	event.room_start[0] = @'
 		// NERFS
-		if room == ruin_12
+		switch room
 		{
-			for (var i = 0; i < 3; i++)
-			{
-				with instance_create(1024, 1440 + (i * 32), obj_custom_object)
+			case ruin_12:
+				for (var i = 0; i < 3; i++)
 				{
-					sprite = 0;
-					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
-					
-					image_speed = 0.35;
-					depth = 4;
-				}
-			}
-			
-			if global.laps >= 2
-				instance_create(1024, 1440, obj_solid).image_yscale = 3;
-		}
-		else if room == farm_4
-		{
-			with instance_place(928, 224, obj_platform)
-			{
-				x = 992;
-				image_xscale = 9;	
-			}
-			
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			tilemap_set(map_id, 0, 29, 7);
-			tilemap_set(map_id, 0, 30, 7);
-			tilemap_set(map_id, 1, 31, 7);
-			
-			for (var i = 0; i < 2; i++)
-			{
-				with instance_create(928 + (i * 32), 224, obj_custom_object)
-				{
-					sprite = 0;
-					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
-					
-					image_speed = 0.35;
-					depth = 4;
-				}
-			}
-			
-			if global.laps < 2
-				instance_create(928, 224, obj_platform).image_xscale = 2;
-		}
-		else if room == farm_11
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			tilemap_set(map_id, 0, 104, 65);
-			tilemap_set(map_id, 0, 105, 65);
-			tilemap_set(map_id, 0, 106, 65);
-			
-			tilemap_set(map_id, 0, 104, 66);
-			tilemap_set(map_id, 0, 105, 66);
-			tilemap_set(map_id, 0, 106, 66);
-			
-			tilemap_set(map_id, 0, 104, 67);
-			tilemap_set(map_id, 0, 105, 67);
-			tilemap_set(map_id, 0, 106, 67);
-			
-			tilemap_set(map_id, 148, 104, 68);
-			tilemap_set(map_id, 148, 105, 68);
-			tilemap_set(map_id, 13, 106, 68);
-			
-			for (var i = 0; i < 3; i++)
-			{
-				for (var j = 0; j < 3; j++)
-				{
-					if i == 1 && (j == 1 || j == 2)
-						continue;
-					with instance_create(3328 + (i * 32), 2080 + (j * 32), obj_custom_object)
+					with instance_create(1024, 1440 + (i * 32), obj_custom_object)
 					{
 						sprite = 0;
-						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
 						
 						image_speed = 0.35;
 						depth = 4;
 					}
 				}
-			}
+				
+				if global.laps >= 2
+					instance_create(1024, 1440, obj_solid).image_yscale = 3;
+			break;
 			
-			if global.laps >= 2
-				instance_destroy(instance_place(3328, 2080, obj_solid));
-		}
-		else if room == farm_12b
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			// 60, 61, 62
-			tilemap_set(map_id, 62, 130, 11);
-			tilemap_set(map_id, 61, 129, 11);
-			tilemap_set(map_id, 60, 128, 11);
-			
-			for (var i = 0; i < 2; i++)
-			{
-				for (var j = 0; j < 5; j++)
+			case farm_4:
+				with instance_place(928, 224, obj_platform)
 				{
-					var z = 128, a = 12;
-					
-					tilemap_set(map_id, 0, z + i, a + j);
-					
-					with instance_create(4096 + (i * 32), 384 + (j * 32), obj_custom_object)
+					x = 992;
+					image_xscale = 9;	
+				}
+				
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				tilemap_set(map_id, 0, 29, 7);
+				tilemap_set(map_id, 0, 30, 7);
+				tilemap_set(map_id, 1, 31, 7);
+				
+				for (var i = 0; i < 2; i++)
+				{
+					with instance_create(928 + (i * 32), 224, obj_custom_object)
 					{
 						sprite = 0;
-						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
 						
 						image_speed = 0.35;
 						depth = 4;
 					}
 				}
-			}
-			
-			if global.laps >= 2
-			{
-				instance_destroy(instance_place(3136, 512, obj_spike), false);
-				instance_destroy(instance_place(3168, 512, obj_spike), false);
-				instance_destroy(instance_place(3200, 512, obj_spike), false);
 				
-				instance_place(4096, -32, obj_solid).image_yscale = 13;
+				if global.laps < 2
+					instance_create(928, 224, obj_platform).image_xscale = 2;
+			break;
+			
+			case farm_11:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
 				
-				instance_create(4768, 530, obj_priest);
-			}
-		}
-		else if room == street_john
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			for (var i = 0; i < 6; i++)
-			{
-				instance_destroy(instance_place(544 + (i * 32), 480, obj_spike), false);
+				tilemap_set(map_id, 0, 104, 65);
+				tilemap_set(map_id, 0, 105, 65);
+				tilemap_set(map_id, 0, 106, 65);
 				
-				for (var j = 0; j < 2; j++)
+				tilemap_set(map_id, 0, 104, 66);
+				tilemap_set(map_id, 0, 105, 66);
+				tilemap_set(map_id, 0, 106, 66);
+				
+				tilemap_set(map_id, 0, 104, 67);
+				tilemap_set(map_id, 0, 105, 67);
+				tilemap_set(map_id, 0, 106, 67);
+				
+				tilemap_set(map_id, 148, 104, 68);
+				tilemap_set(map_id, 148, 105, 68);
+				tilemap_set(map_id, 13, 106, 68);
+				
+				for (var i = 0; i < 3; i++)
 				{
-					var z = 17, a = 16;
-					
-					tilemap_set(map_id, 0, z + i, a + j);
-				}
-			}
-			
-			for (var i = 0; i < 2; i++)
-			{
-				for (var j = 0; j < 2; j++)
-				{
-					with instance_place(672 + (i * 32), 416 + (j * 32), obj_collect)
-						y += 128;
-				}
-			}
-			
-			instance_destroy(instance_place(544, 512, obj_solid));
-		}
-		else if room == street_4
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			tilemap_set(map_id, 108, 162, 29);
-			tilemap_set(map_id, 88, 162, 28);
-			tilemap_set(map_id, 68, 162, 27);
-			tilemap_set(map_id, 29, 162, 26);
-			
-			tilemap_set(map_id, 104, 163, 26);
-			tilemap_set(map_id, 104, 164, 26);
-			tilemap_set(map_id, 108, 165, 26);
-			
-			tilemap_set(map_id, 64, 162, 25);
-			tilemap_set(map_id, 64, 163, 25);
-			
-			for (var i = 0; i < 3; i++)
-			{
-				for (var j = 0; j < 3; j++)
-				{
-					tilemap_set(map_id, 0, 163 + i, 27 + j);
-					
-					if (i == 0 || i == 1) && (j == 0 || j == 1)
-						continue;
-					
-					with instance_create(5216 + (i * 32), 864 + (j * 32), obj_custom_object)
+					for (var j = 0; j < 3; j++)
 					{
-						sprite = 0;
-						sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
-						
-						image_speed = 0.35;
-						depth = 4;
+						if i == 1 && (j == 1 || j == 2)
+							continue;
+						with instance_create(3328 + (i * 32), 2080 + (j * 32), obj_custom_object)
+						{
+							sprite = 0;
+							sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+							
+							image_speed = 0.35;
+							depth = 4;
+						}
 					}
 				}
-			}
-			
-			if global.laps >= 2
-			{
-				with instance_place(5120, 672, obj_solid)
-					image_xscale = 3;
 				
-				with instance_create(5216, 672, obj_solid)
+				if global.laps >= 2
+					instance_destroy(instance_place(3328, 2080, obj_solid));
+			break;
+			
+			case farm_12b:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				// 60, 61, 62
+				tilemap_set(map_id, 62, 130, 11);
+				tilemap_set(map_id, 61, 129, 11);
+				tilemap_set(map_id, 60, 128, 11);
+				
+				for (var i = 0; i < 2; i++)
 				{
-					image_xscale = 3;
-					image_yscale = 6;
+					for (var j = 0; j < 5; j++)
+					{
+						var z = 128, a = 12;
+						
+						tilemap_set(map_id, 0, z + i, a + j);
+						
+						with instance_create(4096 + (i * 32), 384 + (j * 32), obj_custom_object)
+						{
+							sprite = 0;
+							sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+							
+							image_speed = 0.35;
+							depth = 4;
+						}
+					}
 				}
 				
-				instance_create(3712, 1088, obj_grabbiehand);
-			}
-		}
-		else if room == plage_cavern3
-		{
-			for (var i = 0; i < 7; i++)
-			{
-				with instance_create(2016 + (i * 32), 1376, obj_custom_object)
+				if global.laps >= 2
 				{
-					sprite = 0;
-					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					instance_destroy(instance_place(3136, 512, obj_spike), false);
+					instance_destroy(instance_place(3168, 512, obj_spike), false);
+					instance_destroy(instance_place(3200, 512, obj_spike), false);
 					
-					image_speed = 0.35;
-					depth = 4;
-				}
-			}
-			
-			for (var i = 0; i < 2; i++)
-			{
-				with instance_create(2208, 1408 + (i * 32), obj_custom_object)
-				{
-					sprite = 0;
-					sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+					instance_place(4096, -32, obj_solid).image_yscale = 13;
 					
-					image_speed = 0.35;
-					depth = 4;
+					instance_create(4768, 530, obj_priest);
 				}
-			}
+			break;
 			
-			if global.laps >= 2
-			{
-				instance_create(2016, 1376, obj_solid).image_xscale = 7;
-				instance_create(2208, 1408, obj_solid).image_yscale = 2;
-			}
-		}
-		else if room == graveyard_7
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
-			
-			tilemap_set(map_id, 3, 30, 17);
-			tilemap_set(map_id, 3, 30, 23);
-			
-			instance_place(576, 544, obj_platform).image_xscale = 13;
-			instance_place(576, 736, obj_platform).image_xscale = 13;
-			
-			for (var i = 0; i < 3; i++)
-			{
-				var z = 31, a = 17;
+			case street_john:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
 				
-				tilemap_set(map_id, 0, z + i, a);
-				
-				with instance_create(992 + (i * 32), 544, obj_custom_object)
+				for (var i = 0; i < 6; i++)
 				{
-					sprite = 0;
-					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
+					instance_destroy(instance_place(544 + (i * 32), 480, obj_spike), false);
 					
-					image_speed = 0.35;
-					depth = 4;
+					for (var j = 0; j < 2; j++)
+					{
+						var z = 17, a = 16;
+						
+						tilemap_set(map_id, 0, z + i, a + j);
+					}
 				}
-			}
-			
-			for (var i = 0; i < 3; i++)
-			{
-				var z = 31, a = 23;
 				
-				tilemap_set(map_id, 0, z + i, a);
-				
-				with instance_create(992 + (i * 32), 736, obj_custom_object)
+				for (var i = 0; i < 2; i++)
 				{
-					sprite = 0;
-					sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
-					
-					image_speed = 0.35;
-					depth = 4;
+					for (var j = 0; j < 2; j++)
+					{
+						with instance_place(672 + (i * 32), 416 + (j * 32), obj_collect)
+							y += 128;
+					}
 				}
-			}
+				
+				instance_destroy(instance_place(544, 512, obj_solid));
+			break;
 			
-			if global.laps < 2
-			{
-				instance_create(992, 544, obj_platform).image_xscale = 3;
-				instance_create(992, 736, obj_platform).image_xscale = 3;
-			}
-		}
-		else if room == industrial_2
-		{
-			var lay_id = layer_get_id("Tiles_1");
-			var map_id = layer_tilemap_get_id(lay_id);
+			case street_4:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				tilemap_set(map_id, 108, 162, 29);
+				tilemap_set(map_id, 88, 162, 28);
+				tilemap_set(map_id, 68, 162, 27);
+				tilemap_set(map_id, 29, 162, 26);
+				
+				tilemap_set(map_id, 104, 163, 26);
+				tilemap_set(map_id, 104, 164, 26);
+				tilemap_set(map_id, 108, 165, 26);
+				
+				tilemap_set(map_id, 64, 162, 25);
+				tilemap_set(map_id, 64, 163, 25);
+				
+				for (var i = 0; i < 3; i++)
+				{
+					for (var j = 0; j < 3; j++)
+					{
+						tilemap_set(map_id, 0, 163 + i, 27 + j);
+						
+						if (i == 0 || i == 1) && (j == 0 || j == 1)
+							continue;
+						
+						with instance_create(5216 + (i * 32), 864 + (j * 32), obj_custom_object)
+						{
+							sprite = 0;
+							sprite_index = (global.laps < 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+							
+							image_speed = 0.35;
+							depth = 4;
+						}
+					}
+				}
+				
+				if global.laps >= 2
+				{
+					with instance_place(5120, 672, obj_solid)
+						image_xscale = 3;
+					
+					with instance_create(5216, 672, obj_solid)
+					{
+						image_xscale = 3;
+						image_yscale = 6;
+					}
+					
+					instance_create(3712, 1088, obj_grabbiehand);
+				}
+			break;
 			
-			if global.laps >= 2
-			{
+			case plage_cavern3:
 				for (var i = 0; i < 7; i++)
-					tilemap_set(map_id, 0, 110 + i, 24);
-				
-				for (var i = 0; i < 4; i++)
 				{
-					tilemap_set(map_id, 0, 105 + i, 33);
-					tilemap_set(map_id, 0, 97 + i, 42);
+					with instance_create(2016 + (i * 32), 1376, obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
 				}
 				
-				instance_destroy(instance_place(3520, 768, obj_platform));
-				instance_destroy(instance_place(3360, 1056, obj_platform));
-				instance_destroy(instance_place(3104, 1344, obj_platform));
+				for (var i = 0; i < 2; i++)
+				{
+					with instance_create(2208, 1408 + (i * 32), obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps >= 2 ? other.sr("spr_lapblockwoke") : other.sr("spr_lapblocksleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
 				
-				instance_create(3520, 768, obj_sprite).sprite = sr("spr_broken_platform");
-				instance_create(3360, 1056, obj_sprite).sprite = sr("spr_broken_platform");
-				instance_create(3104, 1344, obj_sprite).sprite = sr("spr_broken_platform");
+				if global.laps >= 2
+				{
+					instance_create(2016, 1376, obj_solid).image_xscale = 7;
+					instance_create(2208, 1408, obj_solid).image_yscale = 2;
+				}
+			break;
+			
+			case graveyard_7:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
 				
-				instance_create(3712, 768, obj_sprite).sprite = other.sr("spr_broken_platform_left");
-				instance_create(3456, 1056, obj_sprite).sprite = other.sr("spr_broken_platform_left");
-				instance_create(3200, 1344, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+				tilemap_set(map_id, 3, 30, 17);
+				tilemap_set(map_id, 3, 30, 23);
 				
-				instance_destroy(instance_place(3712, 768, obj_ladder));
-				instance_destroy(instance_place(3392, 1056, obj_ladder));
-				instance_destroy(instance_place(3104, 1344, obj_ladder));
-			}
-		}
-		else if room == industrial_1 && global.laps >= 2
-			instance_create(2208, 3698, obj_priest).image_xscale = -1;
-		else if room == sewer_12
-		{
-			var lay_id = layer_get_id("Tiles_2");
-			var map_id = layer_tilemap_get_id(lay_id);
+				instance_place(576, 544, obj_platform).image_xscale = 13;
+				instance_place(576, 736, obj_platform).image_xscale = 13;
+				
+				for (var i = 0; i < 3; i++)
+				{
+					var z = 31, a = 17;
+					
+					tilemap_set(map_id, 0, z + i, a);
+					
+					with instance_create(992 + (i * 32), 544, obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+				
+				for (var i = 0; i < 3; i++)
+				{
+					var z = 31, a = 23;
+					
+					tilemap_set(map_id, 0, z + i, a);
+					
+					with instance_create(992 + (i * 32), 736, obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps < 2 ? other.sr("spr_lapplatform_woke") : other.sr("spr_lapplatform_sleep"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+				
+				if global.laps < 2
+				{
+					instance_create(992, 544, obj_platform).image_xscale = 3;
+					instance_create(992, 736, obj_platform).image_xscale = 3;
+				}
+			break;
 			
-			var map_id2 = layer_tilemap_get_id(layer_get_id("Tiles_1"));
+			case industrial_2:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				if global.laps >= 2
+				{
+					for (var i = 0; i < 7; i++)
+						tilemap_set(map_id, 0, 110 + i, 24);
+					
+					for (var i = 0; i < 4; i++)
+					{
+						tilemap_set(map_id, 0, 105 + i, 33);
+						tilemap_set(map_id, 0, 97 + i, 42);
+					}
+					
+					instance_destroy(instance_place(3520, 768, obj_platform));
+					instance_destroy(instance_place(3360, 1056, obj_platform));
+					instance_destroy(instance_place(3104, 1344, obj_platform));
+					
+					instance_create(3520, 768, obj_sprite).sprite = sr("spr_broken_platform");
+					instance_create(3360, 1056, obj_sprite).sprite = sr("spr_broken_platform");
+					instance_create(3104, 1344, obj_sprite).sprite = sr("spr_broken_platform");
+					
+					instance_create(3712, 768, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+					instance_create(3456, 1056, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+					instance_create(3200, 1344, obj_sprite).sprite = other.sr("spr_broken_platform_left");
+					
+					instance_destroy(instance_place(3712, 768, obj_ladder));
+					instance_destroy(instance_place(3392, 1056, obj_ladder));
+					instance_destroy(instance_place(3104, 1344, obj_ladder));
+				}
+			break;
 			
-			// GENERATED CODE FROM TILE DATA COMPARER
-			// NAME MADE UP JUST NOW
+			case industrial_1:
+				if global.laps >= 2
+					instance_create(2208, 3698, obj_priest).image_xscale = -1;
+			break;
 			
-			tilemap_set(map_id, 97, 33, 7);
-			tilemap_set(map_id, 134, 34, 7);
-			tilemap_set(map_id, 113, 33, 8);
-			tilemap_set(map_id, 114, 34, 8);
-			tilemap_set(map_id, 10, 29, 9);
-			tilemap_set(map_id, 0, 30, 9);
-			tilemap_set(map_id, 0, 31, 9);
-			tilemap_set(map_id, 0, 32, 9);
-			tilemap_set(map_id, 129, 33, 9);
-			tilemap_set(map_id, 130, 34, 9);
-			tilemap_set(map_id, 60, 29, 10);
-			tilemap_set(map_id, 0, 30, 10);
-			tilemap_set(map_id, 0, 31, 10);
-			tilemap_set(map_id, 0, 32, 10);
-			tilemap_set(map_id, 268435610, 33, 10);
-			tilemap_set(map_id, 268435609, 34, 10);
-			tilemap_set(map_id, 60, 29, 11);
-			tilemap_set(map_id, 268435797, 33, 11);
-			tilemap_set(map_id, 805306425, 34, 11);
-			tilemap_set(map_id, 60, 29, 12);
-			tilemap_set(map_id, 177, 33, 12);
-			tilemap_set(map_id, 290, 34, 12);
-			tilemap_set(map_id, 60, 29, 13);
-			tilemap_set(map_id, 0, 33, 13);
-			tilemap_set(map_id, 0, 34, 13);
-			tilemap_set(map_id, 60, 29, 14);
-			tilemap_set(map_id, 0, 30, 14);
-			tilemap_set(map_id, 0, 31, 14);
-			tilemap_set(map_id, 0, 32, 14);
-			tilemap_set(map_id, 0, 33, 14);
-			tilemap_set(map_id, 0, 34, 14);
-			tilemap_set(map_id, 60, 29, 15);
-			tilemap_set(map_id, 0, 30, 15);
-			tilemap_set(map_id, 0, 31, 15);
-			tilemap_set(map_id, 0, 32, 15);
-			tilemap_set(map_id, 0, 33, 15);
-			tilemap_set(map_id, 0, 34, 15);
-			tilemap_set(map_id, 0, 30, 16);
-			tilemap_set(map_id, 0, 30, 17);
-			tilemap_set(map_id, 0, 30, 18);
+			case sewer_12:
+				var lay_id = layer_get_id("Tiles_2");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				var map_id2 = layer_tilemap_get_id(layer_get_id("Tiles_1"));
+				
+				// GENERATED CODE FROM TILE DATA COMPARER
+				// NAME MADE UP JUST NOW
+				
+				tilemap_set(map_id, 97, 33, 7);
+				tilemap_set(map_id, 134, 34, 7);
+				tilemap_set(map_id, 113, 33, 8);
+				tilemap_set(map_id, 114, 34, 8);
+				tilemap_set(map_id, 10, 29, 9);
+				tilemap_set(map_id, 0, 30, 9);
+				tilemap_set(map_id, 0, 31, 9);
+				tilemap_set(map_id, 0, 32, 9);
+				tilemap_set(map_id, 129, 33, 9);
+				tilemap_set(map_id, 130, 34, 9);
+				tilemap_set(map_id, 60, 29, 10);
+				tilemap_set(map_id, 0, 30, 10);
+				tilemap_set(map_id, 0, 31, 10);
+				tilemap_set(map_id, 0, 32, 10);
+				tilemap_set(map_id, 268435610, 33, 10);
+				tilemap_set(map_id, 268435609, 34, 10);
+				tilemap_set(map_id, 60, 29, 11);
+				tilemap_set(map_id, 268435797, 33, 11);
+				tilemap_set(map_id, 805306425, 34, 11);
+				tilemap_set(map_id, 60, 29, 12);
+				tilemap_set(map_id, 177, 33, 12);
+				tilemap_set(map_id, 290, 34, 12);
+				tilemap_set(map_id, 60, 29, 13);
+				tilemap_set(map_id, 0, 33, 13);
+				tilemap_set(map_id, 0, 34, 13);
+				tilemap_set(map_id, 60, 29, 14);
+				tilemap_set(map_id, 0, 30, 14);
+				tilemap_set(map_id, 0, 31, 14);
+				tilemap_set(map_id, 0, 32, 14);
+				tilemap_set(map_id, 0, 33, 14);
+				tilemap_set(map_id, 0, 34, 14);
+				tilemap_set(map_id, 60, 29, 15);
+				tilemap_set(map_id, 0, 30, 15);
+				tilemap_set(map_id, 0, 31, 15);
+				tilemap_set(map_id, 0, 32, 15);
+				tilemap_set(map_id, 0, 33, 15);
+				tilemap_set(map_id, 0, 34, 15);
+				tilemap_set(map_id, 0, 30, 16);
+				tilemap_set(map_id, 0, 30, 17);
+				tilemap_set(map_id, 0, 30, 18);
+				
+				for (var i = 0; i < 3; i++)
+				{
+					for (var j = 0; j < 5; j++)
+						tilemap_set(map_id2, 0, 30 + i, 10 + j);
+				}
+				
+				with instance_place(992, 288, obj_solid)
+				{
+					x = 1056;
+					image_xscale = 2;
+					image_yscale = 4;
+				}
+				
+				instance_place(896, 288, obj_solid).image_xscale = 2;
+				
+				instance_destroy(instance_place(992, 224, obj_tubeenter));
+				instance_destroy(instance_place(992, 544, obj_tubeexitmach));
+			break;
 			
-			for (var i = 0; i < 3; i++)
-			{
-				for (var j = 0; j < 5; j++)
-					tilemap_set(map_id2, 0, 30 + i, 10 + j);
-			}
+			case forest_escape1:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				for (var i = 0; i < 7; i++)
+					tilemap_set(layer_tilemap_get_id(layer_get_id("Tiles_BG3")), 324, 24 + i, 18);
+				
+				// GENERATED FROM TILEDATA COMPARER
+				// BORN 1 DAY AGO
+
+				tilemap_set(map_id, 21, 24, 18);
+				tilemap_set(map_id, 0, 25, 18);
+				tilemap_set(map_id, 0, 26, 18);
+				tilemap_set(map_id, 0, 27, 18);
+				tilemap_set(map_id, 0, 28, 18);
+				tilemap_set(map_id, 0, 29, 18);
+				tilemap_set(map_id, 15, 30, 18);
+				tilemap_set(map_id, 49, 24, 19);
+				tilemap_set(map_id, 0, 25, 19);
+				tilemap_set(map_id, 0, 26, 19);
+				tilemap_set(map_id, 0, 27, 19);
+				tilemap_set(map_id, 0, 28, 19);
+				tilemap_set(map_id, 0, 29, 19);
+				tilemap_set(map_id, 57, 30, 19);
+				tilemap_set(map_id, 63, 24, 20);
+				tilemap_set(map_id, 0, 25, 20);
+				tilemap_set(map_id, 0, 26, 20);
+				tilemap_set(map_id, 0, 27, 20);
+				tilemap_set(map_id, 0, 28, 20);
+				tilemap_set(map_id, 0, 29, 20);
+				tilemap_set(map_id, 43, 30, 20);
+				tilemap_set(map_id, 49, 24, 21);
+				tilemap_set(map_id, 0, 25, 21);
+				tilemap_set(map_id, 0, 26, 21);
+				tilemap_set(map_id, 0, 27, 21);
+				tilemap_set(map_id, 0, 28, 21);
+				tilemap_set(map_id, 0, 29, 21);
+				tilemap_set(map_id, 57, 30, 21);
+				
+				for (var i = 0; i < 5; i++)
+				{
+					with instance_create(800 + (i * 32), 672, obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps >= 2 ? other.sr("spr_lapblocksleep") : other.sr("spr_lapblockwoke"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+				
+				with instance_place(800, 576, obj_solid)
+				{
+					x = 960;
+					image_xscale = 9;
+				}
+				
+				instance_create(800, 576, obj_platform).image_xscale = 5;
+				
+				if global.laps <= 2
+					instance_create(800, 672, obj_solid).image_xscale = 5;
+			break;
 			
-			with instance_place(992, 288, obj_solid)
-			{
-				x = 1056;
-				image_xscale = 2;
-				image_yscale = 4;
-			}
-			
-			instance_place(896, 288, obj_solid).image_xscale = 2;
-			
-			instance_destroy(instance_place(992, 224, obj_tubeenter));
-			instance_destroy(instance_place(992, 544, obj_tubeexitmach));
+			case forest_lap:
+				var lay_id = layer_get_id("Tiles_1");
+				var map_id = layer_tilemap_get_id(lay_id);
+				
+				var map_id2 = layer_tilemap_get_id(layer_get_id("Tiles_2"));
+				
+				tilemap_set(map_id2, 0, 23, 25);
+				tilemap_set(map_id2, 0, 24, 25);
+				tilemap_set(map_id2, 0, 25, 25);
+				tilemap_set(map_id2, 0, 26, 25);
+				tilemap_set(map_id2, 0, 27, 25);
+				
+				tilemap_set(map_id, 91, 23, 25);
+				tilemap_set(map_id, 92, 24, 25);
+				tilemap_set(map_id, 93, 25, 25);
+				tilemap_set(map_id, 96, 26, 25);
+				tilemap_set(map_id, 97, 27, 25);
+				tilemap_set(map_id, 109, 23, 26);
+				tilemap_set(map_id, 110, 24, 26);
+				tilemap_set(map_id, 111, 25, 26);
+				tilemap_set(map_id, 114, 26, 26);
+				tilemap_set(map_id, 115, 27, 26);
+				tilemap_set(map_id, 0, 23, 27);
+				tilemap_set(map_id, 0, 24, 27);
+				tilemap_set(map_id, 0, 25, 27);
+				tilemap_set(map_id, 0, 26, 27);
+				tilemap_set(map_id, 0, 27, 27);
+				
+				// you can guess what this was made with
+				
+				for (var i = 0; i < 3; i++)
+				{
+					with instance_create(768 + (i * 32), 832, obj_custom_object)
+					{
+						sprite = 0;
+						sprite_index = (global.laps >= 2 ? other.sr("spr_lapblocksleep") : other.sr("spr_lapblockwoke"));
+						
+						image_speed = 0.35;
+						depth = 4;
+					}
+				}
+				
+				if global.laps >= 2
+					instance_place(768, 544, obj_solid).image_yscale = 9;
+			break;
 		}
 		
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
