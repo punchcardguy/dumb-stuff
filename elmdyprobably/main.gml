@@ -1579,6 +1579,9 @@ with (instance_create(0, 0, obj_custom_object_ext))
 		thingyx = snickexe.x - camera_get_view_x(view_camera[0]);
 		thingyy = snickexe.x - camera_get_view_y(view_camera[0]);
 		
+		with obj_tubeenter // stupid fucking pipes buff because eggplant is retarded
+			approach_spd = 15;
+		
 		with snickexe
 		{
 			x = room_width / 2;
