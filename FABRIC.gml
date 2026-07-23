@@ -234,10 +234,10 @@ with (instance_create(0, 0, obj_custom_object))
 						for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
 						{
 							for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
-								global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
+								global.customObjects[$ names[j]].events[$ string_replahce_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
 							file_find_close();
 							
-							gml_const_add(names[j], global.customObjects[$ names[j]]);
+							live_api_const_add(names[j], global.customObjects[$ names[j]]);
 						}
 						
 						// get_string_async(global.customObjects, "");
