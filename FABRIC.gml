@@ -12,27 +12,23 @@ with (instance_create(0, 0, obj_custom_object))
 	image_alpha = 0;
 	depth = -9999;
 	mods = [];
-	get_user_folder = function()
+	
+	get_user_directory = function() // simple function that i will not be using for all of time probably
 	{
-		var startPath = "";
-		
-		if (os_type == os_android)
+		switch os_type
 		{
-			var temp = string_split(game_save_id, "/");
-			var first_index = array_get_index("data", temp);
-			startPath = "/storage/emulated/" + temp[first_index + 2];
-		} 
-		else
-		{
-			var temp = string_split(working_directory, "\\");
-			startPath = "C:/Users/" + temp[3];
+			case os_windows:
+				return "C:/Users/" + environment_get_variable("USERNAME") + "/Documents/pizza tower android/";
+			break;
+			
+			case os_android:
+				return "/storage/emulated/0/Documents/pizza tower android/";
+			break;
 		}
-		
-		return startPath + "/Documents/pizza tower android/";
 	}
 	
-	game_directory = get_user_folder();
-	path = game_directory + "mods" + "/";
+	game_directory = get_user_directory();
+	path = game_directory + "mods/";
 	
 	if !directory_exists(game_directory)
 		directory_create(game_directory);
@@ -40,22 +36,11 @@ with (instance_create(0, 0, obj_custom_object))
 	if !directory_exists(path)
 		directory_create(path);
 	
-	ini_open(game_directory + "modloader_user.ini");
-	
-	var saved_path = ini_read_string("General", "saved_path", "");
-	if saved_path != path
-	{
-		get_string_async("(This system was made by hoy_es_diciembre_1225 this code is being used for temporary purposes) Heya!\nJust to let you know that the afom folder is " + (saved_path == "" ? "" : "now ") + "located in:", path);
-		ini_write_string("General", "saved_path", string(path));
-	}
-	
-	ini_close();
-	
 	show_message_async(path);
 	
 	selected = 0;
 	scrolling = 0;
-	quote = @'"';
+	quote = "\"";
 	
 	scr_load_file = function(filename)
 	{
@@ -70,6 +55,12 @@ with (instance_create(0, 0, obj_custom_object))
 		return _gml;
 	}
 	
+	Mod_object = function(_path) constructor
+	{
+		file_path = _path;
+		events = {};
+	}
+	
 	Mod = function(_file_path, _name, _desc, _enabled, _icon) constructor // constructors my beloved
 	{
 		file_path = _file_path;
@@ -78,46 +69,42 @@ with (instance_create(0, 0, obj_custom_object))
 		enabled = _enabled;
 		was_enabled = _enabled;
 		icon = _icon;
+		
+		objects = {};
 	}
 	
-	find_files_recursive = function(folder, ext, max)
+	scr_mod_process_objects = function(struct)
 	{
-		var dirQueue = ds_queue_create();
-		var fileArray = [];
-		ds_queue_enqueue(dirQueue, folder);
-		var startDepth = string_count("/", folder);
-		
-		while !ds_queue_empty(dirQueue)
+		if directory_exists(struct.file_path + "/objects")
 		{
-			var currDir = ds_queue_dequeue(dirQueue);
-			for (var fold = file_find_first(currDir + "*", fa_directory);fold != "";fold = file_find_next())
+			for (var object_names = file_find_first(struct.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
 			{
-				var check = fold + "/";
-				if directory_exists(currDir + check)
+				if asset_get_index(object_names) != -1
 				{
-					if max == undefined or string_count("/", currDir + check) - startDepth <= max
-						ds_queue_enqueue(dirQueue, currDir + check);
+					show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
+					break;
 				}
+								
+				global.customObjects[$ object_names] = new Mod_object(struct.file_path + "/objects/" + object_names + "/");
 			}
+							
 			file_find_close();
-			
-			for (var file = file_find_first(currDir + "*" + ext, 0); file != ""; file = file_find_next())
+							
+			for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
 			{
-				if !directory_exists(currDir + file)
-					array_push(fileArray, currDir + file);
+				for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
+					global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "_event")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
+				file_find_close();
+						
+				trace("Setting ", names[j], " to ", global.customObjects[$ names[j]]);
+				
+				var obj = global.customObjects[$ names[j]];
+				live_variable_add(names[j], method(obj, function()
+				{
+					return self;
+				}));
 			}
-			file_find_close();
 		}
-		
-		return fileArray;
-	}
-	
-	editorTreeMin = function(v, max) // is this just cycle?
-	{
-		if v > max
-			return max + (max - v);
-		else
-			return v;
 	}
 	
 	for (var mods_name = file_find_first(path + "*", fa_directory); mods_name != ""; mods_name = file_find_next())
@@ -138,42 +125,55 @@ with (instance_create(0, 0, obj_custom_object))
 	drawgui_event = @'
 		draw_set_color(c_black);
 		draw_set_alpha(0.5);
-	    draw_rectangle(960,0,-100,540,false); 
+		draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false); 
+
 		if array_length(mods) > 0
 		{
-	        for (var i = 0; i < array_length(mods); i++)
-	        {
-		        var m = mods[i];
+			for (var i = 0, len = array_length(mods); i < len; i++)
+			{
+				var m = mods[i];
+				
 				draw_set_alpha(1);
 				draw_set_color(i == selected ? c_white : c_gray);
+				
 				draw_set_font(global.bigfont);
+				
 				draw_set_valign(fa_middle);
-				draw_set_halign(fa_right);
+				draw_set_halign(fa_left);
+				
 				var width = string_width(concat(string_upper(m.name), " : ", m.enabled ? "ON" : "OFF"));
 				var xscale = min(width, display_get_gui_width() - 20) / width;
-				var lerp_var = scrolling;
-				var x = editorTreeMin(125 + (25*(lerp_var-i)), 125)
-				var y = display_get_gui_height() / 2 + ((i-(lerp_var+0.5)) * 55)
-				draw_text_transformed(x + string_width(string_upper(m.name)), y, concat(string_upper(m.name), " : ", m.enabled ? "ON" : "OFF"), xscale, 1, 0);
+				var height = string_height("A");
+				
+				draw_text_transformed(16, display_get_gui_height() / 2 + (i * (height + 8)) + (scrolling * (height + 8)), concat(string_upper(m.name), " : ", m.enabled ? "ON" : "OFF"), xscale, 1, 0);
 			}
+			
 			draw_set_alpha(0.6);
 			draw_set_color(c_black);
-			draw_rectangle(0, 480, 960, 540, false);
+			
+			draw_rectangle(0, 480, display_get_gui_width(), display_get_gui_height(), false);
+			
 			draw_set_alpha(1);
 			draw_set_color(c_white);
+			
 			draw_set_font(global.smallfont);
+			
 			draw_set_halign(fa_center);
 			draw_set_valign(fa_bottom);
-			draw_text_ext_transformed(display_get_gui_width()/2, 500 + string_height(string_upper(mods[selected].desc)), string_upper(mods[selected].desc), 16, 900, 1, 1, 0);
+			
+			draw_text_ext_transformed(display_get_gui_width() / 2, 500 + string_height(string_upper(mods[selected].desc)), string_upper(mods[selected].desc), 16, 900, 1, 1, 0);
+			
 			draw_sprite_stretched(mods[selected].icon, 0,  display_get_gui_width() - 120, 70, 100, 100);
 		} 
 		else
 		{
 			draw_set_alpha(1);
 			draw_set_font(-1);
+			
 			draw_set_color(c_white);
 			draw_set_valign(fa_center);
 			draw_set_halign(fa_middle);
+			
 			draw_text_transformed(display_get_gui_width() / 2, display_get_gui_height() / 2, string_hash_to_newline("NO MODS FOUND#PRESS X TO EXIT"), 2, 2, 0);
 		} 
 	';
@@ -189,11 +189,13 @@ with (instance_create(0, 0, obj_custom_object))
 			} 
 			exit;
 		}
+		
 		with obj_player1
 			state = 18;
+		
         move = (key_down2 - key_up2);
         selected += move;
-		scrolling = lerp(scrolling,selected,0.1);
+		scrolling = lerp(scrolling, selected, 0.1);
         selected = cycle(selected, 0, array_length(mods));
 		
         if key_jump
@@ -212,59 +214,7 @@ with (instance_create(0, 0, obj_custom_object))
 				
 				if m.enabled
 				{
-					if directory_exists(m.file_path + "/objects")
-					{
-						for (var object_names = file_find_first(m.file_path + "/objects/" + "*", fa_directory); object_names != ""; object_names = file_find_next())
-						{
-							if asset_get_index(object_names) != -1
-							{
-								show_message_async("Object error for \"" + object_names + "\" : Cannot have a object with the same name as an already existing object");
-								break;
-							}
-							
-							global.customObjects[$ object_names] = 
-							{
-								file_path : m.file_path + "/objects/" + object_names + "/",
-								events : {}
-							};
-						}
-						
-						file_find_close();
-						
-						for (var j = 0, names = variable_struct_get_names(global.customObjects), glen = array_length(names); j < glen; j++)
-						{
-							for (var event_names = file_find_first(global.customObjects[$ names[j]].file_path + "*.gml", 0); event_names != ""; event_names = file_find_next())
-								global.customObjects[$ names[j]].events[$ string_replace_all(event_names, ".gml", "")] = scr_load_file(global.customObjects[$ names[j]].file_path + event_names);
-							file_find_close();
-							
-							global.gml_const_map[$ names[j]] = true;
-							global.gml_const_val[$ names[j]] = global.customObjects[$ names[j]];
-						}
-						
-						// get_string_async(global.customObjects, "");
-					}
-					
-					/* live_function_add("instance_create(_x, _y, _obj)", function(_x, _y, _obj)
-					{
-						if !is_struct(_obj)
-							instance_create(_x, _y, _obj);
-						else
-						{
-							myobj = instance_create(_x, _y, obj_custom_object);
-							with myobj
-							{
-								sprite = 0;
-								if _obj.events[$ "create"] != undefined
-								{
-									snippet = live_snippet_create(_obj.events.create);
-									_func = asset_get_index(script_get_name(method(self, live_snippet_call))); // prevent game from going bat shit insane
-									_func(snippet);
-							 	}
-							}
-							
-							return myobj;
-						}
-					}); */
+					scr_mod_process_objects(m);
 					
 					if file_exists(m.file_path + "/init.gml")
 					{
