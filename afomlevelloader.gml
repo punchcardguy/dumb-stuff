@@ -28,10 +28,11 @@ with instance_create(0, 0, obj_custom_object_ext)
 {
 	persistent = 1;
 	image_alpha = 0;
-	doposshit = false;
+	
 	tilemap_surface = -4;
 	tilemap_rendsurf = -4;
 	tilemapinst = -4;
+	
 	seamX = [0, 0];
 	seamY = [0, 0];
 	xDiff = [0, 0];
@@ -42,6 +43,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 	camSeamY = 0;
 	seamsize = 4;
 	seamready = false;
+	
 	// vvv : this used to be a ds_map
 	music_map = 
 	{
@@ -1533,7 +1535,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 			if file[$ "pscore"] != undefined && global.srank != file.pscore
 				global.srank = file.pscore;
 		}
-		doposshit = true;
+		
 		global.killedbitch = false;
 		/* if variable_global_exists("missingspr") && sprite_exists(global.spr_missingtile) && global.missingspr != global.spr_missingtile
 			global.missingspr = global.missingspr; */
@@ -1575,6 +1577,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 					for (var b = 0, i_len6 = array_length(file.instances);b < i_len6;b++)
 					{
 						var j = file.instances[b];
+						
 						if is_real(j.object)
 							j.object = cyopconvertlist[$ (real(j.object) - 1)] != undefined ? cyopconvertlist[$ (real(j.object) - 1)] : "obj_null";
 						if j.object == "obj_iceblockOLD" 
@@ -1583,9 +1586,12 @@ with instance_create(0, 0, obj_custom_object_ext)
 							j.object = "epicboogaloo";
 						if j.object == "obj_soundtest_gus" 
 							j.object = "obj_sprite";
+						
 						var hobject = asset_get_index(j.object);
+						
 						if !is_array(global.afomobjects[$ rm]) 
 							global.afomobjects[$ rm] = [];
+						
 						if (hobject == -1 || hobject == obj_startgate) && !j.deleted
 						{
 							array_push(global.afomobjects[$ rm], 
@@ -1603,108 +1609,19 @@ with instance_create(0, 0, obj_custom_object_ext)
 							});
 						} 
 					}
+					
 					var room_name = global.levelmemory[i].room_name;
+					
 				    global.levelmemory[i].room_index = rm;
 				    global.rooms[$ room_name] = rm;
+					
 				    variable_global_set(room_name, rm);
 				} 
 				exit;
 			}
 		}
-		if doposshit
-		{
-			with obj_player1
-			{
-				var d = (targetDoor == "G" ? epicboogaloo : asset_get_index("obj_door" + string(targetDoor))); 
-				if d != -1 && instance_exists(d) // failsafe incase if there isnt any warps
-				{
-					if hallway == 1
-						x = (d.x + (hallwaydirection * 100));
-					else if box == 1
-						x = (d.x + 32);
-					else
-						x = (d.x + 16);
-					y = (d.y - 14);
-				}
-				if variable_instance_exists(id, "target_x")
-				{
-					if target_x != "null"
-						x = target_x;
-				}
-				if variable_instance_exists(id, "target_y")
-				{
-					if target_y != "null"
-						y = target_y;
-				}
-				if verticalhallway
-				{
-					verticalbuffer = 2;
-					var _vinst = noone;
-					with obj_verticalhallway
-					{
-						event_perform(ev_step, ev_step_normal);
-						if  targetDoor == other.targetDoor
-							_vinst = id;
-					}
-					if target_x != "null"
-					{
-						x = target_x;
-						_vinst = noone;
-					}
-					if target_y != "null"
-					{
-						y = target_y;
-						_vinst = noone;
-					}
-					if _vinst != noone
-					{
-						x = (_vinst.x + (_vinst.sprite_width * vertical_x));
-						var bbox_size = abs((bbox_right - bbox_left));
-						x = clamp(x, (_vinst.x + bbox_size), (_vinst.bbox_right - bbox_size));
-						if vhallwaydirection > 0
-							y = (_vinst.bbox_bottom + 32);
-						else
-							y = (_vinst.bbox_top - 78);
-						if verticalstate == 37
-							state = 37;
-						if state == 37
-						{
-							x = round(x);
-							var i = 0;
-							while (!(scr_solid((x + xscale), y)))
-							{
-								x += xscale;
-								i++;
-								if i > room_width
-									break;
-								else
-									continue;
-							}
-						}
-						y += verticalhall_vsp;
-						vsp = verticalhall_vsp;
-					}
-					y += (vhallwaydirection * 20);
-					y = floor(y);
-					verticalstate = 0;
-				}
-				if place_meeting(x, y, obj_exitgate)
-				{
-					with instance_place(x, y, obj_exitgate)
-						other.x = x;
-				}
-				if state == 119 
-				{
-					x = obj_stopsign.x;
-					y = obj_stopsign.y;
-				} 
-				xstart = x;
-				ystart = y; 
-				roomstartx = x;
-				roomstarty = y;
-			} 
-			doposshit = false;
-		}
+		
+		
 		with obj_player1
 		{
 			if state == 16 
@@ -1728,16 +1645,20 @@ with instance_create(0, 0, obj_custom_object_ext)
 				
 				for (var rooms = file_find_first(other.path + other.levels[other.selected].name + "/levels/" + global.levelname + "/rooms" + "/*.json", 0);rooms != "";rooms = file_find_next())
 				{
-					var file = json_parse(scr_load_file(other.path + other.levels[other.selected].name + "/levels/" + global.levelname + "/rooms/" + rooms));
+					var file = json_parse(other.scr_load_file(other.path + other.levels[other.selected].name + "/levels/" + global.levelname + "/rooms/" + rooms));
 					var meini_file = other.path + other.levels[other.selected].name + "/levels/" + global.levelname + "/level.ini"; 
 					var _song = -4;
+					
 					if variable_global_exists(file.properties.song) 
 						_song = variable_global_get(file.properties.song);
 					else if variable_struct_exists(other.music_map, file.properties.song) 
 						_song = other.music_map[$ file.properties.song];
+					
 					ini_open(meini_file);
+					
 					var escapelen = ini_read_real("data", "escape", 0);
 					var reqscore = ini_read_real("data", "pscore", 0);
+					
 				    array_push(global.levelmemory,
 					{
 				        room_name : string_replace(rooms, ".json", ""),
@@ -1752,6 +1673,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 						escape : escapelen, 
 						pscore : reqscore
 				    });
+					
 					ini_close();
 				}
 				file_find_close();
