@@ -1277,7 +1277,7 @@ with instance_create(0, 0, obj_custom_object_ext)
 		if (os_type == os_android) {
 			var temp = string_split(game_save_id, "/", true)
 			var first_index = array_get_index("data", temp)
-			startPath = "/storage/emulated/" + temp[first_index + 2]
+			startPath = "/storage/emulated/0" + temp[first_index + 2]
 		} else {
 			var temp = string_split(working_directory, "\\", true)
 			startPath = "C:/Users/" + temp[3]
